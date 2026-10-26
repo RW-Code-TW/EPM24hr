@@ -1,4 +1,4 @@
-/* Opening Shift: warmer colours than the engine's default (light and dark). */
-:root{--brand:#9a4a1c;--brand-edge:#6e3211;--accent:#e0a040;--accent-edge:#b07a22;--accent-tint:#fbefd9}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--brand:#c8642c;--brand-edge:#e8925c;--accent:#e8b050;--accent-edge:#f2c878;--accent-tint:#3a2a12}}
-:root[data-theme="dark"]{--brand:#c8642c;--brand-edge:#e8925c;--accent:#e8b050;--accent-edge:#f2c878;--accent-tint:#3a2a12}
+/* EPM24hr：工廠的藍，加上警示燈的橘（亮色與暗色）。 */
+:root{--brand:#1f5a8a;--brand-edge:#143e60;--accent:#e08a1e;--accent-edge:#b06a12;--accent-tint:#fbefd9}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--brand:#3a82c0;--brand-edge:#6aa6dc;--accent:#f0a040;--accent-edge:#f6c078;--accent-tint:#3a2a12}}
+:root[data-theme="dark"]{--brand:#3a82c0;--brand-edge:#6aa6dc;--accent:#f0a040;--accent-edge:#f6c078;--accent-tint:#3a2a12}

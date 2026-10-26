@@ -1,87 +1,115 @@
-/* Opening Shift: the half hour, beat by beat.
-   STORY.segs  the moments of the day (title card name, subtitle, start time in minutes after midnight, light)
-   STORY.beats one thing to do at a time: who or where to go (to), the "next step" line (guide), what is said (lines),
-               an optional mini-game (mini), what is said after it (post), and what changes in the world (after).
-   ST.d keeps what the player chose; the ending is written from it. */
-STORY.segs = {
-  open: {name: 'Before opening', sub: 'The café opens at seven. You have half an hour.', t: 390, mood: 'eve',
-    scene() {W.show('sam', false); W.screen('machine', ['ESPRESSO', 'OFF'], '#93a9b2')}},
-  dial: {name: 'Dialing in', sub: 'The first shot of the day is never quite right.', t: 405, mood: 'day',
-    scene() {W.screen('machine', ['ESPRESSO', 'READY'], '#7fe3c8')}},
-  first: {name: 'Doors open', sub: 'Someone is already waiting outside.', t: 420, mood: 'day',
-    scene() {W.put('sam', 'door'); W.show('sam', true)}}
+/* EPM24hr：共用的部分。選位子、三個數字（達成、F1 信任、體力）、開會時大家坐哪裡、結算。
+   每個位子的一天在 role_*.js：自己的時刻（seg 名稱用位子開頭，例如 cmd_am），每件事都有 when: onRole('cmd')。
+   ST.d.role 記你選的位子；ST.d.ctb、ST.d.f1、ST.d.san 是三個數字（0–100）。 */
+
+/* 五個位子：名字、一句話介紹、你的座位（WORLD 的點）、你的電腦（STORY.places）。recap() 在各自的檔裡補上 */
+const ROLES = {
+  cmd: {name: 'Commodity', pitch: '缺料、改料、CTB', desk: 'd_cmd', pc: 'pc_cmd'},
+  asm: {name: 'Assembly', pitch: '開線、異常、晚班', desk: 'd_asm', pc: 'pc_asm'},
+  tst: {name: 'Testing', pitch: 'Yield、FA、跟催周邊', desk: 'd_tst', pc: 'pc_tst'},
+  shp: {name: 'Shipping', pitch: '庫存、報關、出貨', desk: 'd_shp', pc: 'pc_shp'},
+  mlb: {name: 'MLB', pitch: 'SMA 打板、BM、DOE', desk: 'd_mlb', pc: 'pc_mlb'}
 };
+const EPMS = ['cmd', 'asm', 'tst', 'shp', 'mlb'];
+const onRole = r => () => ST.d.role === r;
+const myPc = () => ROLES[ST.d.role] ? ROLES[ST.d.role].pc : 'pc_cmd';
 
-STORY.beats = [
-  {seg: 'open', to: 'mia', guide: 'Say good morning to Mia behind the bar',
-    lines: () => [['mia', "Morning! You're on bar today. First job: switch on the espresso machine."],
-      ['mia', 'It takes a while to heat up. If we wait until seven, the first customers wait with us.'],
-      ['me', 'On it.']]},
-  {seg: 'open', to: 'machine', guide: 'Switch on the espresso machine',
-    lines: () => [['sys', 'You flip the switch. The boiler starts to hum and the pressure gauge slowly climbs.'],
-      ['sys', 'The group head has to get hot too, or the first shots come out sour.']],
-    after() {if (W) W.screen('machine', ['ESPRESSO', 'HEATING…'], '#ffc94a')}},
-  {seg: 'open', ring: ['Dairy delivery', 'Incoming call', ANSWER],
-    lines: () => [['drv', "Hi, it's the dairy run. Bad news: I'm stuck in traffic, about forty minutes behind."],
-      ['drv', "You'll be short on milk for the first hour. Sorry!"]],
-    mini(done) {
-      say([['mia', 'Short on milk at opening. What do you want to do?']], null, {choice: [
-        ['Run to the corner shop for a few cartons', () => {ST.d.milk = 'shop'; done()}],
-        ["Make it work with what's in the fridge", () => {ST.d.milk = 'fridge'; done()}]]});
-    },
-    post: () => ST.d.milk === 'shop'
-      ? [['sys', 'You jog to the corner shop and back. Four cartons, slightly out of breath.'], ['mia', 'Good. That covers us until the van gets here.']]
-      : [['mia', "Okay. We'll save the milk for the regulars and suggest black coffee to everyone else."]]},
-  {seg: 'dial', to: 'grinder', guide: 'Dial in the grinder',
-    lines: () => [['mia', "Machine's hot. Now the grinder. Pull a shot and watch the timer."],
-      ['mia', 'Most baristas aim for somewhere around 25 to 30 seconds. Too fast usually tastes sour, too slow tastes bitter.']],
-    mini: miniShot},
-  {seg: 'dial', to: 'mia', guide: 'Let Mia taste your shot',
-    lines: () => ST.d.ok
-      ? [['mia', `${ST.d.time} seconds. Let me taste… Yes. Sweet, a little bright. That's the one.`], ['mia', `Leave the grinder on ${ST.d.grind}.`]]
-      : [['mia', 'Still running fast. Let me nudge it… There. Coffee changes every day; you learn it by doing it every morning.'], ['mia', "We'll leave it on 5."]]},
-  {seg: 'first', to: 'door', guide: 'Unlock the front door',
-    lines: () => [['sys', 'You turn the sign to OPEN. Cold air comes in, and so does Sam.'],
-      ['sam', 'Morning! First again, am I?']],
-    after() {if (W) W.walk('sam', 'till')}},
-  {seg: 'first', to: 'sam', guide: "Take Sam's order at the till",
-    lines: () => [['sam', 'The usual, please. A flat white.']].concat(ST.d.milk === 'fridge'
-      ? [['me', "We're short on milk this morning, but there's enough for a regular."], ['sam', "I'll take that as a compliment."]]
-      : [['me', 'Coming right up.']])},
-  {seg: 'first', end: true, t: 422,
-    lines: () => [['sys', 'The first cup goes out at two minutes past seven. The day has started.']]}
-];
-
-/* Mini-game: pick a grind setting, pull a shot, read the time. 1 is finest (slow), 9 is coarsest (fast). */
-function miniShot(done) {
-  let g = 8, shots = 0, last = null;
-  const timeOf = s => Math.round(46 - s * 3.4 + (Math.random() * 2 - 1));   // a made-up model: finer grind, slower shot
-  const draw = () => {
-    const verdict = last == null ? '' : last < 25 ? 'Too fast: thin and sour.' : last > 30 ? 'Too slow: heavy and bitter.' : 'In the window. Taste it.';
-    setPanel('<p>Grind setting: <b class="mono">' + g + '</b> (1 = finest, 9 = coarsest)</p>'
-      + '<div class="row"><button class="btn" id="finer" type="button">Finer</button><button class="btn" id="coarser" type="button">Coarser</button><button class="btn btn-primary" id="pull" type="button">Pull a shot</button></div>'
-      + (last == null ? '<p class="fine">Aim for 25–30 seconds.</p>' : '<p>Shot ' + shots + ': <b class="mono">' + last + ' s</b>. ' + verdict + '</p>')
-      + (last != null && (last >= 25 && last <= 30 || shots >= 5) ? nextBtn('Done') : ''), 'Dial in the grinder');
-    $('#finer').onclick = () => {g = Math.max(1, g - 1); draw()};
-    $('#coarser').onclick = () => {g = Math.min(9, g + 1); draw()};
-    $('#pull').onclick = () => {shots++; last = timeOf(g); SFX.blip(); draw()};
-    if ($('#next')) $('#next').onclick = () => {ST.d.shots = shots; ST.d.grind = g; ST.d.time = last; ST.d.ok = last >= 25 && last <= 30; hidePanel(); done()};
+/* 三個數字。eff = {ctb, f1, san}，改完跳一則通知 */
+const STAT_NAMES = {ctb: '達成', f1: 'F1 信任', san: '體力'};
+function epmAdd(eff) {
+  if (!eff) return;
+  const parts = [];
+  for (const k in STAT_NAMES) {
+    if (!eff[k]) continue;
+    ST.d[k] = Math.max(0, Math.min(100, (ST.d[k] == null ? 60 : ST.d[k]) + eff[k]));
+    parts.push(STAT_NAMES[k] + (eff[k] > 0 ? ' +' : ' −') + Math.abs(eff[k]));
+  }
+  if (parts.length) toast(parts.join('　'), '達成 ' + ST.d.ctb + '・F1 信任 ' + ST.d.f1 + '・體力 ' + ST.d.san);
+}
+/* 做選擇的小遊戲：key 存進 ST.d，opts = [[按鈕字, 值, 效果], …] */
+function epmAsk(key, lines, opts) {
+  return function (done) {
+    say(lines, null, {choice: opts.map(o => [o[0], () => {ST.d[key] = o[1]; epmAdd(o[2]); done()}])});
   };
-  draw();
 }
 
-/* Ending card: written from what actually happened */
-STORY.ending = () => ({
-  title: 'Doors open',
-  tl: ['open', 'dial', 'first'].map(k => [clockOf(STORY.segs[k].t), STORY.segs[k].name]),
-  sub: ST.d.ok ? 'You dialed in the first shot yourself.' : 'Mia dialed in the grinder this time.',
-  stats: [['Shots pulled', ST.d.shots || 0], ['Grind setting', ST.d.ok ? ST.d.grind : 5], ['Milk', ST.d.milk === 'shop' ? 'Corner shop' : 'Fridge only']],
-  lines: [ST.d.milk === 'shop' ? 'The milk van arrived at 07:20. Nobody noticed it had been late.' : 'Two customers took black coffee instead. One of them said they liked it better.',
-    'Tomorrow the beans will be a day older, and you will dial in again.']
-});
+/* 場景：大家回座位／大家去會議室。你的位子上那位同事就是你，先藏起來 */
+const NPC_HOME = {cmd: 'd_cmd', asm: 'd_asm', tst: 'd_tst', shp: 'd_shp', mlb: 'd_mlb', boss: 'd_boss', f1: 'm8', iqc: 'iqc', pd: 'pdn', line: 'line', te: 'te', rep: 'rep', smt: 'smt', wh: 'wh'};
+const SEATS = ['m1', 'm3', 'm4', 'm6', 'm7'];
+function hideMe() {
+  if (!ST.d.role) return;
+  STORY.cast.me.role = ROLES[ST.d.role].name + ' EPM';   /* 接著上次玩時也要對 */
+  if (W) W.show(ST.d.role, false);
+}
+function atWork() {
+  if (!W) return;
+  for (const id in NPC_HOME) W.put(id, NPC_HOME[id]);
+  hideMe();
+}
+function atMeeting() {
+  if (!W) return;
+  atWork();
+  W.put('boss', 'm2'); W.put('f1', 'm5');
+  let i = 0;
+  EPMS.filter(r => r !== ST.d.role).forEach(r => W.put(r, SEATS[i++]));
+  W.put('me', SEATS[i]);
+  hideMe();
+}
+/* 進到自己位子的第一個時刻：人坐回座位上 */
+function atDesk() {atWork(); if (W && ST.d.role) W.put('me', ROLES[ST.d.role].desk)}
 
-/* Talking to someone who is not the next step */
+/* 一天的開頭：在廠門口選位子 */
+STORY.segs.pick = {name: '廠門口', sub: '今天你顧哪一條線？', t: 470, mood: 'day', scene() {atWork()}};
+STORY.beats.push(
+  {seg: 'pick',
+    lines: () => [['sys', '07:50。打卡機嗶了一聲，手機已經有三十幾則未讀。'],
+      ['boss', '早。今天五條線都缺人手，你挑一條顧。'],
+      ['boss', '十點十五分 Daily sync up，F1 也會在。不管顧哪條，記得帶 ETA 來。']],
+    mini(done) {
+      say([['boss', '你今天顧哪一條？']], null, {choice: EPMS.map(r => [ROLES[r].name + '：' + ROLES[r].pitch, () => {
+        Object.assign(ST.d, {role: r, ctb: 70, f1: 60, san: 80});
+        done();
+      }])});
+    },
+    post: () => [['boss', ROLES[ST.d.role].name + '，好。去吧。']],
+    after() {atDesk()}}
+);
+
+/* 跟不是下一步要找的人說話：每個人一句 */
+const CHAT = {
+  cmd: '那顆料的 ETA……你也想知道？我也想知道。',
+  asm: '線上又在叫我了，晚點聊。',
+  tst: '周邊還沒回 Yield。這是今天第三次了。',
+  shp: '客戶要 40 台，架上有 32 台。數學真難。',
+  mlb: 'DOE 計畫今天改第二版了。',
+  boss: '所以 ETA 是什麼時候？',
+  f1: '你們的 CTB 我都有在看喔。',
+  iqc: '判退就是判退，急也沒用。',
+  pd: '盡量、盡量。',
+  line: '線上一切正常。目前。',
+  te: '那個應該是 NTF 啦。',
+  rep: '機台排隊中，下一個。',
+  smt: '打板順序不要再改了好不好。',
+  wh: '架上的數字跟系統一樣，放心。'
+};
 STORY.talk = id => {
-  if (id === 'mia' && ST.seg === 'open' && ST.q === 1) {busy = true; showGuide(); say([['mia', 'Machine first. The switch is on the right side.']], () => {busy = false; showGuide()}, {end: 'OK'}); return true}
-  return false;
+  if (!CHAT[id] || id === ST.d.role) return false;
+  busy = true; showGuide();
+  say([[id, CHAT[id]]], () => {busy = false; showGuide()}, {end: '好'});
+  return true;
+};
+
+/* 結算卡：照實際發生的事寫 */
+STORY.ending = () => {
+  const R = ROLES[ST.d.role] || ROLES.cmd, ctb = ST.d.ctb | 0, f1 = ST.d.f1 | 0, san = ST.d.san | 0;
+  const ot = Math.max(0, ST.clock - 1050), otText = ot ? Math.floor(ot / 60) + ' 小時 ' + (ot % 60) + ' 分' : '準時';
+  const title = ctb >= 75 && f1 >= 65 ? '今天是綠燈' : ctb >= 60 ? '今天撐過去了' : '明天再補';
+  const sub = san <= 30 ? '你的體力比 CTB 還紅。' : f1 >= 70 ? 'F1 今天對你點了兩次頭。' : ctb >= 75 ? '數字很好看，F1 還在觀察你。' : '有些事明天早會一定會被問。';
+  const segs = Object.keys(STORY.segs).filter(k => k.indexOf(ST.d.role + '_') === 0);
+  const tl = [segs[0], segs[Math.floor(segs.length / 2)], segs[segs.length - 1]].filter(Boolean).map(k => [clockOf(STORY.segs[k].t), STORY.segs[k].name]);
+  return {
+    title, sub, led: R.name, tl,
+    stats: [['位子', R.name], ['下班', clockOf(ST.clock)], ['加班', otText], ['達成', ctb], ['F1 信任', f1], ['體力', san]],
+    lines: (R.recap ? R.recap() : []).concat(['明天早上八點，同一張桌子，同一封郵件。'])
+  };
 };

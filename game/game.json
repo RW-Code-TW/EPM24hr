@@ -1,12 +1,17 @@
 {
-  "key": "cafe",
-  "title": "Opening Shift",
-  "description": "Half an hour before a small café opens: switch on the machine, dial in the grinder, unlock the door. A five-minute sample game made with the fab24hr engine.",
-  "lang": "en",
+  "key": "epm24",
+  "title": "EPM24hr",
+  "description": "EMS 工廠 EPM 打工人的一天：Commodity、Assembly、Testing、Shipping、MLB 五個位子，挑一個上班。缺料、改料、Yield、開線異常、出貨，一件一件處理。",
+  "lang": "zh-Hant",
   "src": [
     "data.js",
-    "cafe.js",
-    "story.js"
+    "factory.js",
+    "story.js",
+    "role_cmd.js",
+    "role_asm.js",
+    "role_tst.js",
+    "role_shp.js",
+    "role_mlb.js"
   ],
   "css": "game.css"
 }

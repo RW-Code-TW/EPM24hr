@@ -1,0 +1,4 @@
+# Windows 與 Mac 交替編輯：倉庫裡一律存 LF，避免每次換電腦整份檔案都顯示被改過
+* text=auto eol=lf
+*.png binary
+*.jpg binary
