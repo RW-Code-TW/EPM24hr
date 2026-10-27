@@ -1,4 +1,4 @@
-/* Testing EPM 的一天：08:00 看 COFA → 22:00 各大群組。
+/* Testing EPM（FA DRI）的一天：08:00 看 COFA → 22:00 各大群組。
    ST.d.yield（周邊的 Yield 回覆：log 要 fail log／take 先收下）、ST.d.battle（第二次跟催：data 拿數據打回去／form 先把格式交齊）、
    ST.d.fam（FA 會議：assign 當場分 owner／record 先記下來）、ST.d.night（晚上的群組：all 一則一則回／f1 只回 F1）。 */
 Object.assign(STORY.segs, {
@@ -13,7 +13,7 @@ Object.assign(STORY.segs, {
   tst_night: {name: '各大群組', sub: '流連於 XXT、維信、iMessage。', t: 1200, mood: 'night', scene() {atWork(); if (W) {W.show('f1', false); W.show('boss', false)}}}
 });
 
-const isTst = onRole('tst');
+const isTst = onTst('fa');
 STORY.beats.push(
   {seg: 'tst_am', when: isTst, to: 'pc_tst', guide: '打開郵件，看 COFA 有沒有正常發 Yield',
     lines: () => [['sys', 'COFA 報表寄出去了，但 RF 站那一欄是空的。'],
@@ -95,7 +95,7 @@ STORY.beats.push(
     lines: () => [['sys', ST.d.night === 'all' ? '22:40。所有群組都清空了，暫時。' : '22:30。群組的紅點還在跳，但你不看了。']]}
 );
 
-ROLES.tst.recap = () => [
+TST_SUBS.fa.recap = () => [
   ST.d.yield === 'log' ? '你要周邊附上 fail log：NTF 不再是一句話就能過關。' : '你先收下了 NTF，F1 在早會當場問了。',
   ST.d.battle === 'data' ? '你拿數據打回去，RF fail 確認不是 NTF。' : '周邊交齊了格式，原因還在路上。',
   ST.d.fam === 'assign' ? 'FA 會議每個 action 都有 owner 和 ETA。' : 'FA 會議記錄寄出去了，owner 欄位是空的。'

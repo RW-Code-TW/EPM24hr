@@ -158,6 +158,7 @@ levelAdd('factory', function (K) {
   glassRoom(1, 4.8, 4.8, 8.8, ['EE DOE']);
   glassRoom(5.2, 8.6, 4.8, 8.8, ['CSAR']);
   [[-1.3, 6.4], [2.9, 6.4], [6.9, 6.4]].forEach(([x, z]) => {desk(x, z, 1.6, G); box(.6, .35, .4, M.tool2, x - .3, .97, z, G); box(.35, .06, .35, M.green, x + .4, .83, z, G)});
+  pickBox('offlab', 3.8, 2.2, 4, 2.9, 1.1, 6.8, G);         // 這三間就是 Offline 機台去的 lab
 
   /* 出貨倉（GBWH）：棧板、倉管的桌子，前面是出貨口 */
   flat(5.2, 4.2, tile, 11.8, .006, 6.9, .5, G);
@@ -198,11 +199,11 @@ levelAdd('factory', function (K) {
     v1: [-3, -3.9], v2: [-3, -7.1], smt: [-1, -7.1], smtx: [2.2, -7.1],
     line: [3, -3.9], asmx: [6, -3.9],
     te: [9, -1], rep: [17, -4.55], fax: [17, -2.4],
-    wh: [10.2, 5.45], shipx: [11.4, 3.9]
+    wh: [10.2, 5.45], shipx: [11.4, 3.9], labx: [2.9, 4.1]
   }, 'gate-g1 g1-a4 a1-a2 a2-a3 a3-a4 a4-a5 a5-a6 a6-a7 a7-a8 '
     + 'a2-f1x f1x-f1d a1-mtgx mtgx-m7 m7-m1 m1-m2 m2-m3 m3-m8 m7-m4 m4-m5 m5-m6 m6-m8 '
     + 'a2-epmx epmx-d_cmd epmx-d_asm epmx-oc oc-d_tst oc-d_shp oc-oc2 oc2-d_mlb oc2-d_boss '
-    + 'a3-whsx whsx-iqc whsx-pdn a4-v1 v1-v2 v2-smt smt-smtx v1-line line-asmx a6-te a8-fax fax-rep a7-shipx shipx-wh');
+    + 'a3-whsx whsx-iqc whsx-pdn a4-v1 v1-v2 v2-smt smt-smtx v1-line line-asmx a6-te a8-fax fax-rep a7-shipx shipx-wh g1-labx');
 
   /* 主頁背景的鏡頭 */
   WORLD.shots = [{p: [5, 1, -4], d: 24, yaw: .3, pitch: .7}, {p: [-12, 1, 2], d: 17, yaw: -.35, pitch: .75}, {p: [14, 1, -1], d: 19, yaw: -.4, pitch: .7}];

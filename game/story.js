@@ -6,12 +6,24 @@
 const ROLES = {
   cmd: {name: 'Commodity', pitch: '缺料、改料、CTB', desk: 'd_cmd', pc: 'pc_cmd'},
   asm: {name: 'Assembly', pitch: '開線、異常、晚班', desk: 'd_asm', pc: 'pc_asm'},
-  tst: {name: 'Testing', pitch: 'Yield、FA、跟催周邊', desk: 'd_tst', pc: 'pc_tst'},
+  tst: {name: 'Testing', pitch: 'FA、Test rule、Offline／DOE', desk: 'd_tst', pc: 'pc_tst'},
   shp: {name: 'Shipping', pitch: '庫存、報關、出貨', desk: 'd_shp', pc: 'pc_shp'},
   mlb: {name: 'MLB', pitch: 'SMA 打板、BM、DOE', desk: 'd_mlb', pc: 'pc_mlb'}
 };
 const EPMS = ['cmd', 'asm', 'tst', 'shp', 'mlb'];
 const onRole = r => () => ST.d.role === r;
+/* Testing 再分三種，ST.d.tsub 記你選哪一種（舊存檔沒有就是 fa）。day：那一天的 seg 開頭；recap() 在各自的檔裡補上 */
+const TST_SUBS = {
+  fa: {name: 'FA DRI', pitch: 'Yield、FA、跟催周邊', day: 'tst'},
+  rule: {name: 'Test rule', pitch: '客戶一改再改的測試規則', day: 'tsr'},
+  doe: {name: 'Offline／DOE', pitch: '進機分配、DOE、借機', day: 'tsd'}
+};
+const tstSub = () => TST_SUBS[ST.d.tsub] ? ST.d.tsub : 'fa';
+const onTst = s => () => ST.d.role === 'tst' && tstSub() === s;
+ROLES.tst.recap = () => TST_SUBS[tstSub()].recap();
+/* 你今天的位子叫什麼、你那一天的 seg 開頭 */
+const roleName = () => {const R = ROLES[ST.d.role] || ROLES.cmd; return ST.d.role === 'tst' ? R.name + '・' + TST_SUBS[tstSub()].name : R.name};
+const dayKey = () => ST.d.role === 'tst' ? TST_SUBS[tstSub()].day : ST.d.role;
 const myPc = () => ROLES[ST.d.role] ? ROLES[ST.d.role].pc : 'pc_cmd';
 
 /* 三個數字。eff = {ctb, f1, san}，改完跳一則通知 */
@@ -38,7 +50,7 @@ const NPC_HOME = {cmd: 'd_cmd', asm: 'd_asm', tst: 'd_tst', shp: 'd_shp', mlb: '
 const SEATS = ['m1', 'm3', 'm4', 'm6', 'm7'];
 function hideMe() {
   if (!ST.d.role) return;
-  STORY.cast.me.role = ROLES[ST.d.role].name + ' EPM';   /* 接著上次玩時也要對 */
+  STORY.cast.me.role = roleName() + ' EPM';   /* 接著上次玩時也要對 */
   if (W) W.show(ST.d.role, false);
 }
 function atWork() {
@@ -68,10 +80,11 @@ STORY.beats.push(
     mini(done) {
       say([['boss', '你今天顧哪一條？']], null, {choice: EPMS.map(r => [ROLES[r].name + '：' + ROLES[r].pitch, () => {
         Object.assign(ST.d, {role: r, ctb: 70, f1: 60, san: 80});
-        done();
+        if (r !== 'tst') return done();
+        say([['boss', 'Testing 今天三個缺：FA DRI、Test rule、Offline／DOE。你補哪一個？']], null, {choice: Object.keys(TST_SUBS).map(s => [TST_SUBS[s].name + '：' + TST_SUBS[s].pitch, () => {ST.d.tsub = s; done()}])});
       }])});
     },
-    post: () => [['boss', ROLES[ST.d.role].name + '，好。去吧。']],
+    post: () => [['boss', roleName() + '，好。去吧。']],
     after() {atDesk()}}
 );
 
@@ -105,11 +118,11 @@ STORY.ending = () => {
   const ot = Math.max(0, ST.clock - 1050), otText = ot ? Math.floor(ot / 60) + ' 小時 ' + (ot % 60) + ' 分' : '準時';
   const title = ctb >= 75 && f1 >= 65 ? '今天是綠燈' : ctb >= 60 ? '今天撐過去了' : '明天再補';
   const sub = san <= 30 ? '你的體力比 CTB 還紅。' : f1 >= 70 ? 'F1 今天對你點了兩次頭。' : ctb >= 75 ? '數字很好看，F1 還在觀察你。' : '有些事明天早會一定會被問。';
-  const segs = Object.keys(STORY.segs).filter(k => k.indexOf(ST.d.role + '_') === 0);
+  const segs = Object.keys(STORY.segs).filter(k => k.indexOf(dayKey() + '_') === 0);
   const tl = [segs[0], segs[Math.floor(segs.length / 2)], segs[segs.length - 1]].filter(Boolean).map(k => [clockOf(STORY.segs[k].t), STORY.segs[k].name]);
   return {
-    title, sub, led: R.name, tl,
-    stats: [['位子', R.name], ['下班', clockOf(ST.clock)], ['加班', otText], ['達成', ctb], ['F1 信任', f1], ['體力', san]],
+    title, sub, led: roleName(), tl,
+    stats: [['位子', roleName()], ['下班', clockOf(ST.clock)], ['加班', otText], ['達成', ctb], ['F1 信任', f1], ['體力', san]],
     lines: (R.recap ? R.recap() : []).concat(['明天早上八點，同一張桌子，同一封郵件。'])
   };
 };
