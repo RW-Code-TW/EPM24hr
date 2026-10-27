@@ -10,6 +10,13 @@ EMS 工廠 EPM 打工人的一天。挑一個位子上班：Commodity、Assembly
 打開 `public/index.html`（Mac 用 Safari 或 Chrome，Windows 用 Edge 或 Chrome 都可以）。
 `public/` 裡的三個檔要放在一起。遊戲進度存在這個瀏覽器裡，沒有網路也能玩。
 
+## 網址（GitHub Pages）
+
+https://rw-code-tw.github.io/EPM24hr/
+
+每次 push 到 `main`，`.github/workflows/pages.yml` 會把 `public/` 發佈到這個網址（repo 的 Actions 分頁看得到進度）。
+第一次要先在 GitHub 上設定：repo 要是 public（或帳號有 GitHub Pro），再到 Settings → Pages → Source 選「GitHub Actions」。
+
 ## 改遊戲
 
 需要 Node.js 18 以上（Mac：`brew install node`，或到 nodejs.org 下載）。
