@@ -36,7 +36,7 @@ WORLD.cast = {
   shp: {label: '大衛・Shipping', fill: '#1f8a5b', ink: '#ffffff', cloth: 0x2f6a4a, color: 0x1f8a5b, hair: 0x2a2a2a, node: 'd_shp', face: 0},
   mlb: {label: 'Ken・MLB', fill: '#c06a12', ink: '#ffffff', cloth: 0x6a4a2a, color: 0xc06a12, hair: 0x1a1410, node: 'd_mlb', face: 0},
   boss: {label: 'Jason・主管', fill: '#33454e', ink: '#ffffff', cloth: 0x2a3a42, color: 0x33454e, hair: 0x555555, node: 'd_boss', face: 0},
-  f1: {label: 'Mandy・F1', fill: '#d03a6a', ink: '#ffffff', cloth: 0xeeeeee, color: 0xd03a6a, hair: 0x4a2a1a, long: true, node: 'm8', face: -Math.PI / 2},
+  f1: {label: 'Mandy・F1', fill: '#d03a6a', ink: '#ffffff', cloth: 0xeeeeee, color: 0xd03a6a, hair: 0x4a2a1a, long: true, node: 'f1d', face: 0},
   iqc: {label: '阿珠・IQC', fill: '#3f9a5a', ink: '#ffffff', cloth: 0xf2f2f2, color: 0x3f9a5a, hair: 0x2b1a12, long: true, node: 'iqc', face: 0},
   pd: {label: '小林・PD', fill: '#5a7a2a', ink: '#ffffff', cloth: 0x4a5a3a, color: 0x5a7a2a, hair: 0x1c1c1c, node: 'pdn', face: Math.PI / 2},
   line: {label: '強哥・線長', fill: '#2f5f9f', ink: '#ffffff', cloth: 0x3a5a8a, color: 0x2f5f9f, hair: 0x1c1c1c, node: 'line', face: 0},
@@ -49,18 +49,18 @@ WORLD.cast = {
 /* 走過去用的地方（不是人）。at：站在哪裡才算到了；mark：「！」浮在哪裡。
    pc_*：每個位子自己的電腦。 */
 STORY.places = {
-  pc_cmd: {name: '你的電腦', at: [7.5, 2.25], mark: [7.5, 1.9, 3.4], go: '回座位'},
-  pc_asm: {name: '你的電腦', at: [10.5, 2.25], mark: [10.5, 1.9, 3.4], go: '回座位'},
-  pc_tst: {name: '你的電腦', at: [13.5, 2.25], mark: [13.5, 1.9, 3.4], go: '回座位'},
-  pc_shp: {name: '你的電腦', at: [7.5, 5.25], mark: [7.5, 1.9, 6.4], go: '回座位'},
-  pc_mlb: {name: '你的電腦', at: [10.5, 5.25], mark: [10.5, 1.9, 6.4], go: '回座位'},
-  whs: {name: '物料倉料架', at: [-12.75, -5.25], mark: [-12.5, 3.1, -7.4], go: '走去物料倉'},
-  smtline: {name: 'SMA 線', at: [-3.25, -5.25], mark: [-4.3, 3.2, -7.2], go: '走去 SMA 線'},
-  asmline: {name: '組裝線', at: [5.25, -5.25], mark: [3.8, 2.4, -6.6], go: '走去組裝線'},
-  tester: {name: '測試櫃', at: [11, -5.75], mark: [11.8, 3.2, -8.2], go: '走去測試區'},
-  fabench: {name: 'FA 桌', at: [12, -5.25], mark: [12, 1.9, -3.8], go: '走去 FA 桌'},
-  shipdock: {name: '出貨區', at: [-11.25, 2.75], mark: [-13.5, 2.6, 5.6], go: '走去出貨區'},
-  mtgroom: {name: '會議室', at: [0, 2.75], mark: [0, 1.9, 5], go: '走去會議室'}
+  pc_cmd: {name: '你的電腦', at: [-12.9, 1.45], mark: [-12.9, 1.9, 2.6], go: '回座位'},
+  pc_asm: {name: '你的電腦', at: [-9.7, 1.45], mark: [-9.7, 1.9, 2.6], go: '回座位'},
+  pc_tst: {name: '你的電腦', at: [-12.9, 3.85], mark: [-12.9, 1.9, 5], go: '回座位'},
+  pc_shp: {name: '你的電腦', at: [-9.7, 3.85], mark: [-9.7, 1.9, 5], go: '回座位'},
+  pc_mlb: {name: '你的電腦', at: [-12.9, 6.25], mark: [-12.9, 1.9, 7.4], go: '回座位'},
+  whs: {name: '物料倉料架', at: [-7, -5], mark: [-6, 3.1, -7.2], go: '走去物料倉'},
+  smtline: {name: 'SMA 線', at: [2.2, -7.1], mark: [.4, 3.2, -8.6], go: '走去 SMA 線'},
+  asmline: {name: '組裝線', at: [5, -3.9], mark: [6.4, 2.6, -5.5], go: '走去組裝線'},
+  tester: {name: 'OTA 測試線', at: [7.6, -.9], mark: [6.4, 2.8, -2.5], go: '走去測試線'},
+  fabench: {name: 'FA 桌', at: [17, -2.4], mark: [17, 1.9, -3.4], go: '走去 FA 室'},
+  shipdock: {name: '出貨區', at: [11.4, 3.9], mark: [13, 2.6, 7], go: '走去出貨區'},
+  mtgroom: {name: '會議室', at: [-14.9, 1.9], mark: [-16.7, 1.9, 5.2], go: '走去會議室'}
 };
 
 /* 玩家可以點的詞，點了跳出白話解釋。[詞, 解釋]。同一個意思的幾種寫法用「 / 」隔開。 */

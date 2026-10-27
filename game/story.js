@@ -34,7 +34,7 @@ function epmAsk(key, lines, opts) {
 }
 
 /* 場景：大家回座位／大家去會議室。你的位子上那位同事就是你，先藏起來 */
-const NPC_HOME = {cmd: 'd_cmd', asm: 'd_asm', tst: 'd_tst', shp: 'd_shp', mlb: 'd_mlb', boss: 'd_boss', f1: 'm8', iqc: 'iqc', pd: 'pdn', line: 'line', te: 'te', rep: 'rep', smt: 'smt', wh: 'wh'};
+const NPC_HOME = {cmd: 'd_cmd', asm: 'd_asm', tst: 'd_tst', shp: 'd_shp', mlb: 'd_mlb', boss: 'd_boss', f1: 'f1d', iqc: 'iqc', pd: 'pdn', line: 'line', te: 'te', rep: 'rep', smt: 'smt', wh: 'wh'};
 const SEATS = ['m1', 'm3', 'm4', 'm6', 'm7'];
 function hideMe() {
   if (!ST.d.role) return;

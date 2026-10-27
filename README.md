@@ -28,7 +28,7 @@ npm test         # 自動從頭玩到結算（電腦選第一個選項、手機�
 | 檔案 | 內容 |
 | --- | --- |
 | `game/data.js` | 主頁文字、人物、地方、名詞解釋 |
-| `game/factory.js` | 3D 工廠：物料倉、MLB 線、組裝線、測試區、出貨倉、會議室、EPM 辦公室 |
+| `game/factory.js` | 3D 工廠（照實際樓層圖簡化）：客戶辦公區、會議室、EPM 辦公室、物料倉、SMA 線、組裝線、OTA／AP 線、幾間附房、出貨倉、FA 室 |
 | `game/story.js` | 選位子、三個數字（達成、F1 信任、體力）、開會座位、結算卡 |
 | `game/role_cmd.js` … `role_mlb.js` | 五個位子各自的一天 |
 
