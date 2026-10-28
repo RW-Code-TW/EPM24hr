@@ -4,11 +4,11 @@
 const ruleScreen = v => {if (W) W.screen('tst', ['TEST RULE', v], '#ffc94a')};
 Object.assign(STORY.segs, {
   tsr_am: {name: '看工單', sub: '今天投入的工單，有沒有特殊工單？', t: 480, mood: 'day', scene() {atDesk(); ruleScreen('v1')}},
-  tsr_hi: {name: '給客戶請安', sub: '九點，先去問 F1 今天有沒有特殊的 routine。', t: 540, mood: 'day', scene() {atWork()}},
+  tsr_hi: {name: '給客戶請安', sub: '九點，先去問客戶今天有沒有特殊的 routine。', t: 540, mood: 'day', scene() {atWork()}},
   tsr_peri: {name: '跟周邊串接', sub: '今天的 test rule 和數據收集需求，每一站都要知道。', t: 570, mood: 'day', scene() {atWork()}},
-  tsr_sync: {name: 'Daily sync up', sub: 'F1 的需求，在會議中更新。', t: 615, mood: 'day', scene() {atMeeting()}},
+  tsr_sync: {name: 'Daily sync up', sub: '客戶的需求，在會議中更新。', t: 615, mood: 'day', scene() {atMeeting()}},
   tsr_v2: {name: '改 test rule', sub: '十一點半前發出去。', t: 660, mood: 'day', scene() {atWork(); ruleScreen('v1 → v2')}},
-  tsr_noon: {name: '客戶 internal sync', sub: '十二點，F1 的內部會議結束了。', t: 720, mood: 'day', scene() {atWork(); ruleScreen('v2')}},
+  tsr_noon: {name: '客戶 internal sync', sub: '十二點，客戶的內部會議結束了。', t: 720, mood: 'day', scene() {atWork(); ruleScreen('v2')}},
   tsr_asm: {name: '製造看不懂', sub: '兩點，阿哲拿著 test rule 走過來。', t: 840, mood: 'day', scene() {atWork(); if (W) W.put('asm', 'oc'); ruleScreen('v3')}},
   tsr_line: {name: '送到線上', sub: '四點半，拿去給蘿拉。', t: 990, mood: 'day', scene() {atWork()}},
   tsr_wrap: {name: 'Daily wrap up', sub: '今天改了幾版？', t: 1020, mood: 'eve', scene() {atMeeting()}},
@@ -19,11 +19,11 @@ Object.assign(STORY.segs, {
 const isRule = onTst('rule');
 STORY.beats.push(
   {seg: 'tsr_am', when: isRule, to: 'pc_tst', guide: '打開今天的工單，找特殊工單',
-    lines: () => [['sys', '07:30 你在捷運上就翻過 iMessage 了。F1 昨晚 23:48 只傳了一句：「明天再說。」'],
+    lines: () => [['sys', '07:30 你在捷運上就翻過 iMessage 了。客戶昨晚 23:48 只傳了一句：「明天再說。」'],
       ['sys', '今天投入四張工單。其中一張的備註寫著：「DOE，OTA 收 RF 原始數據」。'],
       ['me', '特殊工單。九點去問 蝦倫 到底要收什麼。']]},
 
-  {seg: 'tsr_hi', when: isRule, to: 'f1', guide: '去 F1 辦公區給 蝦倫 請安',
+  {seg: 'tsr_hi', when: isRule, to: 'f1', guide: '去客戶辦公區給 蝦倫 請安',
     lines: () => [['me', '早安 蝦倫，今天有沒有特殊的 routine？'],
       ['f1', '那張 DOE 工單，OTA 站每台都要存 RF 原始數據，先收 100 台。'],
       ['f1', '其他照 test rule v1 跑。有變我會講。'],
@@ -52,7 +52,7 @@ STORY.beats.push(
       ['sys', '11:28，發出去了。']],
     after() {ruleScreen('v2')}},
 
-  {seg: 'tsr_noon', when: isRule, t: 720, ring: ['蝦倫（F1）', 'iMessage', '看訊息'],
+  {seg: 'tsr_noon', when: isRule, t: 720, ring: ['蝦倫（客戶）', 'iMessage', '看訊息'],
     lines: () => [['f1', '我們 internal sync 剛結束。'],
       ['f1', 'RF 門檻從 -60 改成 -58，下午兩點以後投入的機台生效。'],
       ['me', '（又又要改。）']]},
@@ -91,12 +91,12 @@ STORY.beats.push(
       ['f1', ST.d.rcol === 'face' ? 'DOE 的原始數據我看到了，每一站都收得很完整。' : '早上的 DOE 機台，retest 站那份原始數據沒存到。'],
       ['boss', ST.d.rzh === 'zh' ? '中文版那張不錯，其他專案也拿去用。' : '照舊門檻跑的那十台，明天早上補測。']]},
 
-  {seg: 'tsr_eve', when: isRule, t: 1080, ring: ['蝦倫（F1）', 'iMessage', '看訊息'],
+  {seg: 'tsr_eve', when: isRule, t: 1080, ring: ['蝦倫（客戶）', 'iMessage', '看訊息'],
     lines: () => [['f1', '明天開始 OTA 2 也要收原始數據。DOE 工單改成抽 50%。'],
       ['me', '（v4。）']]},
   {seg: 'tsr_eve', when: isRule, to: 'pc_tst', guide: '回座位，處理 v4',
     lines: () => [['sys', '18:00 到 19:00，第四版。']],
-    mini: epmAsk('reve', [['me', '（現在發，周邊今晚就要改設定。明早發，F1 要多等半天。）']], [
+    mini: epmAsk('reve', [['me', '（現在發，周邊今晚就要改設定。明早發，客戶要多等半天。）']], [
       ['今晚改完發出去，明早生效', 'tonight', {f1: 5, san: -8}],
       ['回 蝦倫：明早 sync up 確認後再生效', 'tmr', {san: 3, f1: -3}]]),
     post: () => ST.d.reve === 'tonight'

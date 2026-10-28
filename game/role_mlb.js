@@ -1,5 +1,5 @@
 /* MLB EPM 的一天：08:00 看 SMA／Test 進度 → 22:00 遠端顧線。早會 09:00、晚會 15:30，比別人早。
-   ST.d.doe（F1 的 DOE 需求：add 明天加打／lock 先 lockdown 原計畫）、ST.d.bm（缺料：have 先打有料的板／wait 等料照原順序）、
+   ST.d.doe（客戶的 DOE 需求：add 明天加打／lock 先 lockdown 原計畫）、ST.d.bm（缺料：have 先打有料的板／wait 等料照原順序）、
    ST.d.alloc（主板分配：tst 先給 Testing 做 FA／asm 先給 Assembly 衝量）。 */
 Object.assign(STORY.segs, {
   mlb_am: {name: '看 SMA 進度', sub: '昨晚打了幾片板？', t: 480, mood: 'day', scene() {atDesk(); if (W) {W.screen('smt', ['SMA', 'INPUT 520/600'], '#ffc94a'); W.tower('smt', 'amber')}}},
@@ -41,7 +41,7 @@ STORY.beats.push(
 
   {seg: 'mlb_doe', when: isMlb, to: 'pc_mlb', guide: '整理內部的 DOE 需求，交給客戶',
     lines: () => [['sys', '你收齊各單位的 DOE 需求：Testing 要 10 片做 FA、Assembly 要 20 片驗治具。'],
-      ['sys', '你把它們整理成一張表寄給 F1，標題：「明日計畫 lockdown」。']]},
+      ['sys', '你把它們整理成一張表寄給客戶，標題：「明日計畫 lockdown」。']]},
 
   {seg: 'mlb_pm', when: isMlb, to: 'cmd', guide: '去找 Commodity 小芸問欠料',
     lines: () => [['cmd', '那顆料？下午三點才會還倉。我也在追。'],
@@ -63,7 +63,7 @@ STORY.beats.push(
       ['asm', '我要 20 片驗治具。'],
       ['f1', '主板就那麼多，你們自己先排好。']]},
 
-  {seg: 'mlb_adj', when: isMlb, ring: ['蝦倫（F1）', '來電', ANSWER],
+  {seg: 'mlb_adj', when: isMlb, ring: ['蝦倫（客戶）', '來電', ANSWER],
     lines: () => [['f1', '主板分配我想改一下。FA 比較急，還是出貨比較急，你建議？']],
     mini: epmAsk('alloc', [['me', '（Testing 要 FA 的數據，Assembly 要衝出貨。）']], [
       ['主板先給 Testing 做 FA', 'tst', {f1: 4, ctb: -3}],

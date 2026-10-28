@@ -1,5 +1,5 @@
 /* Assembly EPM 的一天：08:00 開線異常 → 隔天 06:00 晚班交接。唯一真的上滿 24 小時的位子。
-   ST.d.open（開線：run 先開線／stop 停線對料）、ST.d.seq（流線順序：doe 照 F1／vol 先衝量）、
+   ST.d.open（開線：run 先開線／stop 停線對料）、ST.d.seq（流線順序：doe 照客戶／vol 先衝量）、
    ST.d.fa（FA 匯報：truth 照實講／blame 推給來料）、ST.d.night（半夜治具壞：back 回廠／remote 遠端）。 */
 Object.assign(STORY.segs, {
   asm_am: {name: '開線', sub: '八點，線上已經在等料。', t: 480, mood: 'day', scene() {atDesk(); if (W) {W.tower('asm', 'amber'); W.screen('asm', ['FATP', 'UPH 0 / 120'], '#ffc94a')}}},
@@ -41,7 +41,7 @@ STORY.beats.push(
       ['cmd', '那顆料中午前會到，我盯著。'],
       ['f1', '今天的流線，先跑 DOE 的機台。我們下午就要數據。']],
     mini: epmAsk('seq', [['me', '（先跑 DOE，主力 config 今天就做不滿。）']], [
-      ['照 F1 的要求，先跑 DOE 機台', 'doe', {f1: 6, ctb: -4}],
+      ['照客戶的要求，先跑 DOE 機台', 'doe', {f1: 6, ctb: -4}],
       ['主力 config 先衝量，DOE 排下午', 'vol', {ctb: 5, f1: -5}]]),
     post: () => ST.d.seq === 'doe'
       ? [['f1', '謝謝。數據出來第一個給我。']]
@@ -58,7 +58,7 @@ STORY.beats.push(
   {seg: 'asm_fa', when: isAsm, to: 'fabench', guide: '整理 Assembly FA',
     lines: () => [['sys', '三台機台外觀刮傷、一台螺絲滑牙。你把照片一張一張串進 FA 簡報。'],
       ['rep', '刮傷的位置都一樣，應該是治具。不過還在查。']]},
-  {seg: 'asm_fa', when: isAsm, t: 900, ring: ['蝦倫（F1）', '來電', ANSWER],
+  {seg: 'asm_fa', when: isAsm, t: 900, ring: ['蝦倫（客戶）', '來電', ANSWER],
     lines: () => [['f1', 'FA 匯報時間到了。刮傷的 root cause 是什麼？']],
     mini: epmAsk('fa', [['me', '（維修說是治具，但還沒有證據。）']], [
       ['照實講：疑似治具磨損，還在查', 'truth', {f1: 5, san: -3}],
@@ -105,7 +105,7 @@ STORY.beats.push(
 
 ROLES.asm.recap = () => [
   ST.d.open === 'run' ? '八點準時開線，第三站空了一個早上。' : '你們一站一站對完料，九點才開線，沒有重工。',
-  ST.d.seq === 'doe' ? 'DOE 機台先跑，F1 下午拿到數據。' : '主力 config 先衝量，DOE 排到下午。',
-  ST.d.fa === 'truth' ? '刮傷照實報：疑似治具，明天要給量測數據。' : '你說是來料，F1 轉頭去問了 Commodity。',
+  ST.d.seq === 'doe' ? 'DOE 機台先跑，客戶下午拿到數據。' : '主力 config 先衝量，DOE 排到下午。',
+  ST.d.fa === 'truth' ? '刮傷照實報：疑似治具，明天要給量測數據。' : '你說是來料，客戶轉頭去問了 Commodity。',
   ST.d.night === 'back' ? '半夜一點，你穿著拖鞋出現在線上。' : '半夜一點，你用手機鏡頭修好了一條線。'
 ];

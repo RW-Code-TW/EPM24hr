@@ -1,7 +1,7 @@
 /* Shipping EPM 的一天：08:00 看客戶需求 → 20:00 宿舍裡的訊小通、維信、iMessage → 22:00。
-   特殊事件「通宵」：答應了 F1 的急單（rush = yes），22:30 晚班打來報關數量不夠，選擇回廠就一路跟到早上卡車開走。
+   特殊事件「通宵」：答應了客戶的急單（rush = yes），22:30 晚班打來報關數量不夠，選擇回廠就一路跟到早上卡車開走。
    ST.d.draw（畫出貨：part 先出 32 台／pull 跟 Assembly 要 8 台）、ST.d.nimbus（周邊挑機：rule 照規則／let 讓他指定序號）、
-   ST.d.loan（OPM 要換借機：urs 先更新 URS／swap 先換再補）、ST.d.rush（F1 急單：yes 答應／eta 給實際 ETA）、
+   ST.d.loan（OPM 要換借機：urs 先更新 URS／swap 先換再補）、ST.d.rush（客戶急單：yes 答應／eta 給實際 ETA）、
    ST.d.nloan（晚班要轉借機：rule 沒單不轉／ok 先轉明天補單）、ST.d.ovn（22:30 報關數量不夠：go 回廠通宵／stay 交代晚班）、
    ST.d.rt（凌晨兩台 retest：wait 等結果／swap 換 candidate 頂上）。 */
 const isOvn = () => ST.d.role === 'shp' && ST.d.rush === 'yes' && ST.d.ovn === 'go';
@@ -9,7 +9,7 @@ Object.assign(STORY.segs, {
   shp_am: {name: '客戶的機台需求', sub: '先看客戶要幾台。', t: 480, mood: 'day', scene() {atDesk()}},
   shp_inv: {name: '畫出貨', sub: '更新乾淨庫存，再看倉庫有幾台。', t: 540, mood: 'day', scene() {atWork()}},
   shp_cus: {name: '報關', sub: '在庫明細對完，報關數量交給關務提單。', t: 570, mood: 'day', scene() {atWork()}},
-  shp_mtg: {name: '早會', sub: '出貨數字，F1 會一台一台對。', t: 600, mood: 'day', scene() {atMeeting()}},
+  shp_mtg: {name: '早會', sub: '出貨數字，客戶會一台一台對。', t: 600, mood: 'day', scene() {atMeeting()}},
   shp_nimbus: {name: 'Fulfill Nimbus', sub: '準備乾淨庫存，給周邊挑機。', t: 690, mood: 'day', scene() {atWork()}},
   shp_pm: {name: '跟進流線入庫', sub: '出貨的機台在哪一站？借出去的機台在誰手上？', t: 810, mood: 'day', scene() {atWork()}},
   shp_wrap: {name: '晚會', sub: '今天出了幾台？還有幾台沒入庫？', t: 1020, mood: 'eve', scene() {atMeeting()}},
@@ -68,7 +68,7 @@ STORY.beats.push(
     lines: () => ST.d.draw === 'pull'
       ? [['asm', '你要的 8 台，6 台過測試了，2 台在 retest。'], ['me', '四點前能入庫嗎？'], ['asm', '6 台可以。']]
       : [['asm', '明天要補的 8 台，我排在早上第一批。'], ['me', '感謝。']]},
-  {seg: 'shp_pm', when: isShp, t: 860, to: 'f1b', guide: '去 F1 辦公區找 Y陳，處理借機需求',
+  {seg: 'shp_pm', when: isShp, t: 860, to: 'f1b', guide: '去客戶辦公區找 Y陳，處理借機需求',
     lines: () => [['f1b', '上週借給 RF 的那 3 台，要換成 config B。另外再補借 2 台給 Camera。'],
       ['f1b', '還有，借出去的 loan 機台，有 4 台到今天還沒還。']],
     mini: epmAsk('loan', [['me', '（換借機要先更新 URS。可是 Y陳現在就要。）']], [
@@ -77,7 +77,7 @@ STORY.beats.push(
     post: () => ST.d.loan === 'urs'
       ? [['f1b', '好，URS 更新完寄我。'], ['sys', '你順手寄了一封信，追那 4 台還沒還的 loan 機台。']]
       : [['f1b', '太好了，謝謝！'], ['me', '（URS、借機單、Nimbus，三個地方都要補。）']]},
-  {seg: 'shp_pm', when: isShp, t: 900, ring: ['蝦倫（F1）', '來電', ANSWER],
+  {seg: 'shp_pm', when: isShp, t: 900, ring: ['蝦倫（客戶）', '來電', ANSWER],
     lines: () => [['f1', '臨時多一個需求：明天早上八點，再多 5 台 config A，要給我們的實驗室。']],
     mini: epmAsk('rush', [['me', '（明天早上的 candidates 還沒算。）']], [
       ['答應：明天八點給', 'yes', {f1: 6, san: -10}],
@@ -92,7 +92,7 @@ STORY.beats.push(
 
   {seg: 'shp_wrap', when: isShp, to: 'boss', guide: '在晚會報告今天的出貨',
     lines: () => [['boss', '今天出了幾台？'],
-      ['me', ST.d.draw === 'pull' ? '38 台出貨，2 台在 retest，明天第一批補。' : '32 台出貨，明天補 8 台' + (ST.d.rush === 'yes' ? '，加上 F1 的 5 台。' : '。')],
+      ['me', ST.d.draw === 'pull' ? '38 台出貨，2 台在 retest，明天第一批補。' : '32 台出貨，明天補 8 台' + (ST.d.rush === 'yes' ? '，加上客戶的 5 台。' : '。')],
       ['mlb', '明天要的主板我晚上會再確認一次。'],
       ['boss', '好。交接郵件記得寫 candidates。']]},
   {seg: 'shp_wrap', when: isShp, t: 1050, to: 'wh', guide: '散會後確認包裝明細、包裝進度和入庫',
@@ -126,7 +126,7 @@ STORY.beats.push(
   {seg: 'shp_dorm', when: () => isShp() && ST.d.rush === 'yes', t: 1350, ring: ['晚班倉管', '來電', ANSWER],
     lines: () => [['sys', '22:30。你剛躺上床。'],
       ['sys', '（電話那頭）報關數量還差 6 台。OQC 晚班只有一個人，4 台還沒放；retest 的 2 台還在跑。卡車六點到。'],
-      ['sys', '（電話那頭）F1 要的那 5 台也在這一車上。']],
+      ['sys', '（電話那頭）客戶要的那 5 台也在這一車上。']],
     mini: epmAsk('ovn', [['me', '（明早八點，蝦倫要看到 5 台。今晚少一台，報關就要重來。）']], [
       ['回廠，今晚盯到卡車開走', 'go', {ctb: 8, f1: 6, san: -25}],
       ['交代晚班 push，明早五點進廠', 'stay', {san: 4, ctb: -6, f1: -4}]]),
@@ -158,7 +158,7 @@ STORY.beats.push(
       ? [['te', '好，我陪你等。'], ['sys', '你們坐在 OTA 線旁邊，看著進度條。']]
       : [['sys', '你從明天的 candidates 裡挑了一台 config A，換掉那台 fail 的。報關明細要改一行。']]},
 
-  {seg: 'shp_ovn2', when: isOvn, ring: ['蝦倫（F1）', 'iMessage', '看訊息'],
+  {seg: 'shp_ovn2', when: isOvn, ring: ['蝦倫（客戶）', 'iMessage', '看訊息'],
     lines: () => [['f1', '數量確定了嗎？早上八點的 5 台也在裡面嗎？'],
       ['me', '確定。OQC 放了 4 台，' + (ST.d.rt === 'wait' ? 'retest 那台三點出結果。' : 'fail 的那台我換了一台頂上。')],
       ['f1', '好。（凌晨三點，秒回。）']]},
@@ -179,7 +179,7 @@ STORY.beats.push(
       ['ada', '欸，想不想看紅果短劇？我看到第 48 集了。']]},
   {seg: 'shp_ovn3', when: isOvn, t: 1800, to: 'shipdock', guide: '看機台上卡車',
     lines: () => [['sys', '06:00，卡車準時到。胖虎一箱一箱刷條碼。'],
-      ['wh', ST.d.rt === 'wait' ? '報關數量的機台，一台不少。F1 的 5 台也在。' : '一台不少。換上去的那台也刷到了。'],
+      ['wh', ST.d.rt === 'wait' ? '報關數量的機台，一台不少。客戶的 5 台也在。' : '一台不少。換上去的那台也刷到了。'],
       ['sys', '06:20，卡車開走。']]},
   {seg: 'shp_ovn3', when: isOvn, end: true, t: 1890,
     lines: () => [['sys', '07:30。你回宿舍洗了個澡。阿凱剛起床：「你昨天幾點回來的？」'],
@@ -191,7 +191,7 @@ ROLES.shp.recap = () => [
   ST.d.draw === 'pull' ? '你跟 Assembly 要了今天下線的機台，差一點就湊滿 40 台。' : '今天先出 32 台，剩下的明天補。',
   ST.d.nimbus === 'rule' ? 'config B 留給出貨，周邊挑了 A。' : '周邊挑走了 config B，Nimbus 上多一行 gap。',
   ST.d.loan === 'urs' ? '換借機照流程，先更新 URS。' : '換借機先給了 Y陳，URS 還欠著。',
-  ST.d.rush === 'yes' ? 'F1 的急單你一口答應：明天八點。' : '你先算庫存，再回 F1 實際的 ETA。',
+  ST.d.rush === 'yes' ? '客戶的急單你一口答應：明天八點。' : '你先算庫存，再回客戶實際的 ETA。',
   ST.d.nloan === 'rule' ? '晚班要轉借機，你堅持先提單。' : '晚班的借機先轉了，明天補單。'
 ].concat(ST.d.rush !== 'yes' ? [] : ST.d.ovn === 'go'
   ? ['22:30 你回到廠裡，一路盯到 06:20 卡車開走。', ST.d.rt === 'wait' ? '凌晨三點，retest 那台 pass 了。' : '凌晨，你換了一台 candidate 頂上 fail 的那台。']

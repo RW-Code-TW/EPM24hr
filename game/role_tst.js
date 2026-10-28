@@ -1,10 +1,10 @@
 /* Testing EPM（FA DRI）的一天：08:00 看 COFA → 22:00 各大群組。
    ST.d.yield（周邊的 Yield 回覆：log 要 fail log／take 先收下）、ST.d.battle（第二次跟催：data 拿數據打回去／form 先把格式交齊）、
-   ST.d.fam（FA 會議：assign 當場分 owner／record 先記下來）、ST.d.night（晚上的群組：all 一則一則回／f1 只回 F1）。 */
+   ST.d.fam（FA 會議：assign 當場分 owner／record 先記下來）、ST.d.night（晚上的群組：all 一則一則回／f1 只回客戶）。 */
 Object.assign(STORY.segs, {
   tst_am: {name: '看 COFA', sub: '昨晚的 Yield 有沒有正常發出去？', t: 480, mood: 'day', scene() {atDesk(); if (W) W.screen('tst', ['YIELD', '--.-%'], '#ffc94a')}},
   tst_call: {name: '跟催 Yield', sub: '周邊回了沒？', t: 540, mood: 'day', scene() {atWork()}},
-  tst_sync: {name: 'Daily sync up', sub: 'F1 第一句一定是問 Yield。', t: 615, mood: 'day', scene() {atMeeting()}},
+  tst_sync: {name: 'Daily sync up', sub: '客戶第一句一定是問 Yield。', t: 615, mood: 'day', scene() {atMeeting()}},
   tst_noon: {name: '跟催 FA', sub: '機台簽進 FA 了沒？', t: 690, mood: 'day', scene() {atWork()}},
   tst_pm: {name: '第二次跟催', sub: '下午兩點，周邊的回覆來了。', t: 840, mood: 'day', scene() {atWork()}},
   tst_fa: {name: 'FA 會議', sub: '你主持。', t: 900, mood: 'day', scene() {atWork()}},
@@ -28,7 +28,7 @@ STORY.beats.push(
       ['先收下，回頭再看', 'take', {ctb: 2, f1: -6}]]),
     post: () => ST.d.yield === 'log'
       ? [['te', '……好啦，十一點前給你。'], ['me', '（馴化周邊，第一步。）']]
-      : [['te', '讚啦！'], ['me', '（F1 等一下一定會問。）']]},
+      : [['te', '讚啦！'], ['me', '（客戶等一下一定會問。）']]},
   {seg: 'tst_call', when: isTst, to: 'tester', guide: '看一號測試櫃的 fail 機台',
     lines: () => [['sys', '一號櫃亮著紅燈。螢幕上，同一個 RF 測項連續 fail 三台。'],
       ['me', '這不像 NTF。拍下來。']],
@@ -83,20 +83,20 @@ STORY.beats.push(
 
   {seg: 'tst_night', when: isTst, ring: ['XXT 群組', '99+ 則訊息', '打開'],
     lines: () => [['sys', 'XXT、維信、iMessage，三個群組同時跳紅點。'],
-      ['sys', '一台 retest 又 fail、一個治具校正過期、F1 問明天的 Yield 預估。']],
+      ['sys', '一台 retest 又 fail、一個治具校正過期、客戶問明天的 Yield 預估。']],
     mini: epmAsk('night', [['me', '（現在十點。）']], [
       ['一則一則回完', 'all', {san: -12, f1: 4}],
-      ['只回 F1 的，其他明早再說', 'f1', {san: 4, f1: -2}]]),
+      ['只回客戶的，其他明早再說', 'f1', {san: 4, f1: -2}]]),
     post: () => ST.d.night === 'all'
       ? [['sys', '回完最後一則，時鐘跳到 22:40。']]
-      : [['sys', '你回了 F1，把手機翻過去。']],
+      : [['sys', '你回了客戶，把手機翻過去。']],
     after() {ST.clock = Math.max(ST.clock, ST.d.night === 'all' ? 1360 : 1350); hud()}},
   {seg: 'tst_night', when: isTst, end: true, t: 1350,
     lines: () => [['sys', ST.d.night === 'all' ? '22:40。所有群組都清空了，暫時。' : '22:30。群組的紅點還在跳，但你不看了。']]}
 );
 
 TST_SUBS.fa.recap = () => [
-  ST.d.yield === 'log' ? '你要周邊附上 fail log：NTF 不再是一句話就能過關。' : '你先收下了 NTF，F1 在早會當場問了。',
+  ST.d.yield === 'log' ? '你要周邊附上 fail log：NTF 不再是一句話就能過關。' : '你先收下了 NTF，客戶在早會當場問了。',
   ST.d.battle === 'data' ? '你拿數據打回去，RF fail 確認不是 NTF。' : '周邊交齊了格式，原因還在路上。',
   ST.d.fam === 'assign' ? 'FA 會議每個 action 都有 owner 和 ETA。' : 'FA 會議記錄寄出去了，owner 欄位是空的。'
 ];

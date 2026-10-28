@@ -6,12 +6,12 @@ Object.assign(STORY.segs, {
   cmd_am: {name: '打開 KT 郵件', sub: '昨晚的缺料 CTB 在等你。', t: 480, mood: 'day', scene() {atDesk()}},
   cmd_fc: {name: '新到料 FC', sub: '昨晚到的料，今天能不能投？', t: 510, mood: 'day', scene() {atWork()}},
   cmd_ctb: {name: '初版缺料 CTB', sub: '九點，發給客戶確認改料。', t: 540, mood: 'day', scene() {atWork()}},
-  cmd_sync: {name: 'Daily sync up', sub: 'F1、Project Lead、五條線的 EPM 都在。', t: 615, mood: 'day', scene() {atMeeting()}},
+  cmd_sync: {name: 'Daily sync up', sub: '客戶、Project Lead、五條線的 EPM 都在。', t: 615, mood: 'day', scene() {atMeeting()}},
   cmd_mat: {name: '到料與發料', sub: '會一散，周邊單位就在等料。', t: 660, mood: 'day', scene() {atWork()}},
   cmd_noon: {name: '會後版 CTB', sub: '會上講的每一個 ETA，現在都要寫下來。', t: 720, mood: 'day', scene() {atWork()}},
   cmd_doe: {name: 'DOE Tracker', sub: '一點，更新 DOE 的料況。', t: 780, mood: 'day', scene() {atWork()}},
   cmd_pm: {name: '隔天的 CTB', sub: '明天十二張工單，四百多顆料。還有 Long Term CTB。', t: 840, mood: 'day', scene() {atWork()}},
-  cmd_f1: {name: '跟 F1 核對', sub: '隔天 CTB、改料、Rel CTB，一次對完。', t: 900, mood: 'day', scene() {atWork()}},
+  cmd_f1: {name: '跟客戶核對', sub: '隔天 CTB、改料、Rel CTB，一次對完。', t: 900, mood: 'day', scene() {atWork()}},
   cmd_eve: {name: '晚會版 CTB', sub: '四點半，Sub 的需求也要一起對。', t: 990, mood: 'eve', scene() {atWork()}},
   cmd_wrap: {name: 'Daily wrap up', sub: '開完會，新到的料還要繼續發。', t: 1020, mood: 'eve', scene() {atMeeting()}},
   cmd_kit: {name: 'ok2kit', sub: '料齊了沒？發出去就收不回來。', t: 1080, mood: 'eve', scene() {atWork()}},
@@ -49,7 +49,7 @@ STORY.beats.push(
       ? [['pd', '好，A 料我先發。B 料我拉去 IQC。'], ['iqc', '（遠遠地）又要 sorting？好啦。']]
       : [['aae', '我中午前給你結論。'], ['me', '（初版 CTB 先把 B 料標黃。）']]},
 
-  {seg: 'cmd_ctb', when: isCmd, ring: ['蝦倫（F1）', '來電', ANSWER],
+  {seg: 'cmd_ctb', when: isCmd, ring: ['蝦倫（客戶）', '來電', ANSWER],
     lines: () => [['f1', '初版 CTB 我看到了。第三顆料到港要後天，你們有沒有替代料？'],
       ['f1', '還是這批 config 先拿掉？我九點半前要回上面。']],
     mini: epmAsk('alt', [['me', '（二供的料倉庫有，但還沒做過這個 config。）']], [
@@ -102,7 +102,7 @@ STORY.beats.push(
     lines: () => [['sys', 'Long Term CTB：往後看四週。第三週有一顆電阻會缺，現在不追，到時候就是整條線停。'],
       ['sys', '寄出。順手又簽了四張原物料和 Sub 的發料單。']]},
 
-  {seg: 'cmd_f1', when: isCmd, to: 'f1', guide: '找 F1 核對隔天 CTB 和改料，並說明 Rel CTB',
+  {seg: 'cmd_f1', when: isCmd, to: 'f1', guide: '找客戶核對隔天 CTB 和改料，並說明 Rel CTB',
     lines: () => (ST.d.alt === 'swap'
       ? [['f1', '二供的料的驗證文件呢？'], ['me', '品保剛寄給我，我轉給你。'], ['f1', '好，我簽了。明天的 CTB 可以把它算進去。']]
       : [['f1', 'downselection 那批，上面同意了。'], ['f1', '不過下週要補回來，ECTB 要先排好。'], ['me', '好，我今晚一起排。']])
@@ -147,8 +147,8 @@ STORY.beats.push(
       ['sys', 'ECTB 拉到下週五，Special list 又多一行。'],
       ['roomie', '你下班了沒？'],
       ['me', '下班了。在上班。']]},
-  {seg: 'cmd_late', when: isCmd, t: 1260, to: 'homepc', guide: '發實際缺料版 CTB 給 F1',
-    lines: () => [['sys', '21:40，實際缺料版 CTB 寄給 F1。'],
+  {seg: 'cmd_late', when: isCmd, t: 1260, to: 'homepc', guide: '發實際缺料版 CTB 給客戶',
+    lines: () => [['sys', '21:40，實際缺料版 CTB 寄給客戶。'],
       ['f1', '（已讀）']]},
   {seg: 'cmd_late', when: isCmd, end: true, t: 1320,
     lines: () => [['sys', '22:00。你闔上筆電。泡麵已經糊了。明天早上八點，KT 郵件又會是滿的。']]}

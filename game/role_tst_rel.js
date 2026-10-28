@@ -1,14 +1,14 @@
 /* Testing EPM（Rel tracker）的一天：08:00 登入 COFA 導出 Rel 候選機 → 兩鍋 OK2REL 給線尾倉 → 20:00 宿舍裡的各大群組。
    ST.d.relOk、ST.d.relBad（第一鍋放進 Rel tracker 的對的、錯的各幾台）、ST.d.lrt（昨天的重測：watch 當場盯／later 請維修中午回）、
    ST.d.lrd（RD 的 comment：tame 拿 Rel plan 逐條對／give 照他要的換）、ST.d.leol（線尾倉少一台：go 自己去找／ask 請倉管查 SFC）、
-   ST.d.lrd2（下午第二輪：lead 拉 RD 主管對齊／note 明天早會提）、ST.d.lnight（晚上的群組：all 一則一則回／key 只回 F1 和 RD）。 */
+   ST.d.lrd2（下午第二輪：lead 拉 RD 主管對齊／note 明天早會提）、ST.d.lnight（晚上的群組：all 一則一則回／key 只回客戶和 RD）。 */
 const relScreen = l => {if (W) W.screen('tst', ['REL TRACKER', l], '#ffc94a')};
 Object.assign(STORY.segs, {
   tsl_am: {name: '第一鍋 Rel 候選機', sub: '登入 COFA，導出最新測完 GK 的機台。', t: 480, mood: 'day', scene() {atDesk(); relScreen('第一鍋')}},
   tsl_send: {name: '發 Rel tracker', sub: '八點半，寄給各 RD 單位回 comment。', t: 510, mood: 'day', scene() {atWork()}},
   tsl_rt: {name: '昨天的重測', sub: '昨天說要重測的那幾台，重測完了沒？', t: 525, mood: 'day', scene() {atWork()}},
   tsl_rd: {name: '跟催 RD', sub: '九點十五分，RD 回了沒？', t: 555, mood: 'day', scene() {atWork()}},
-  tsl_sync: {name: 'Daily sync up', sub: 'F1 會問：今天幾台 OK2REL？', t: 615, mood: 'day', scene() {atMeeting()}},
+  tsl_sync: {name: 'Daily sync up', sub: '客戶會問：今天幾台 OK2REL？', t: 615, mood: 'day', scene() {atMeeting()}},
   tsl_fa: {name: 'Push FA', sub: '周邊的機台，簽進 FA 了沒？', t: 645, mood: 'day', scene() {atWork()}},
   tsl_noon: {name: '新鮮出爐的 OK2REL', sub: '十二點，第一鍋送線尾倉。', t: 720, mood: 'day', scene() {atWork()}},
   tsl_pm: {name: '跟催 RD action', sub: '兩點，早上的 comment 有下文了嗎？', t: 840, mood: 'day', scene() {atWork()}},
@@ -66,17 +66,17 @@ STORY.beats.push(
       ['te', '……你們 Testing 都這麼有效率嗎。']]},
 
   {seg: 'tsl_noon', when: isRel, to: 'pc_tst', guide: '發送今早新鮮出爐的 OK2REL 機台給線尾倉',
-    lines: () => [['sys', '12:00，「OK2REL - 第一鍋」：' + (ST.d.relOk || 0) + ' 台，寄給線尾倉，副本 F1。']],
+    lines: () => [['sys', '12:00，「OK2REL - 第一鍋」：' + (ST.d.relOk || 0) + ' 台，寄給線尾倉，副本客戶。']],
     after() {relScreen('OK2REL 第一鍋')}},
   {seg: 'tsl_noon', when: isRel, t: 750, ring: ['線尾倉', '訊息', '看訊息'],
     lines: () => [['eol', '你寄的 OK2REL 名單，架上少一台，序號找不到。'],
-      ['eol', 'F1 一點半要來領。']],
-    mini: epmAsk('leol', [['me', '（少一台，F1 領的時候就少一台。）']], [
+      ['eol', '客戶一點半要來領。']],
+    mini: epmAsk('leol', [['me', '（少一台，客戶領的時候就少一台。）']], [
       ['自己跑去線尾倉找', 'go', {ctb: 4, san: -6}],
       ['請倉管查 SFC 再回我', 'ask', {san: 2, ctb: -2}]]),
     post: () => ST.d.leol === 'go'
       ? [['sys', '你在出貨倉旁邊的架子上找到了：標籤貼成隔壁那台的序號。'], ['sys', '13:20，齊了。']]
-      : [['eol', 'SFC 顯示它還在 OTA 線，沒下線。'], ['sys', 'F1 領走的時候，少了一台。']]},
+      : [['eol', 'SFC 顯示它還在 OTA 線，沒下線。'], ['sys', '客戶領走的時候，少了一台。']]},
 
   {seg: 'tsl_pm', when: isRel, to: 'rd', guide: '跟催 RD 回覆 Rel tracker action',
     lines: () => ST.d.lrd === 'tame'
@@ -113,20 +113,20 @@ STORY.beats.push(
       ['me', '等 SW 刷完版本，明早重測。']]},
 
   {seg: 'tsl_eve', when: isRel, to: 'pc_tst', guide: '發送下午第二鍋 OK2REL 給線尾倉',
-    lines: () => [['sys', '18:30，「OK2REL - 第二鍋」：4 台，寄給線尾倉，副本 F1 和 Y陳。'],
+    lines: () => [['sys', '18:30，「OK2REL - 第二鍋」：4 台，寄給線尾倉，副本客戶和 Y陳。'],
       ['f1b', '（iMessage）收到，明早領。']],
     after() {relScreen('OK2REL 第二鍋')}},
 
   {seg: 'tsl_night', when: isRel, ring: ['XXT 群組', '99+ 則訊息', '打開'],
     lines: () => [['sys', '20:00，宿舍。你剛把外套掛起來。'],
-      ['sys', 'XXT、維信、iMessage 一起亮：一台 Rel 機摔落後開不了機、RD 問明天第三鍋幾點、F1 問明天幾台 OK2REL。'],
+      ['sys', 'XXT、維信、iMessage 一起亮：一台 Rel 機摔落後開不了機、RD 問明天第三鍋幾點、客戶問明天幾台 OK2REL。'],
       ['roomie', '你的手機是不是在震？']],
     mini: epmAsk('lnight', [['me', '（現在八點。）']], [
       ['一則一則回完', 'all', {san: -12, f1: 4}],
-      ['只回 F1 和 RD 的，其他明早再說', 'key', {san: 4, f1: -2}]]),
+      ['只回客戶和 RD 的，其他明早再說', 'key', {san: 4, f1: -2}]]),
     post: () => ST.d.lnight === 'all'
       ? [['sys', '回完最後一則，22:10。'], ['roomie', '你下班了沒？'], ['me', '下班了。在上班。']]
-      : [['sys', '你回了 F1 和 RD，把手機蓋在桌上。'], ['roomie', '要不要打一場？'], ['me', '……一場就好。']],
+      : [['sys', '你回了客戶和 RD，把手機蓋在桌上。'], ['roomie', '要不要打一場？'], ['me', '……一場就好。']],
     after() {ST.clock = Math.max(ST.clock, ST.d.lnight === 'all' ? 1330 : 1320); hud()}},
   {seg: 'tsl_night', when: isRel, end: true, t: 1320,
     lines: () => [['sys', ST.d.lnight === 'all' ? '22:10。群組暫時安靜了。明早八點，COFA 又會有新測完 GK 的機台。' : '22:00。紅點還在跳。明早八點，COFA 又會有新測完 GK 的機台。']]}
@@ -164,6 +164,6 @@ function miniRel(done) {
 TST_SUBS.rel.recap = () => [
   '第一鍋放進 Rel tracker ' + (ST.d.relOk || 0) + ' 台' + (ST.d.relBad ? '，其中混了 ' + ST.d.relBad + ' 台不該放的。' : '，沒有放錯。'),
   ST.d.lrd === 'tame' ? '你拿 Rel plan 跟 RD 逐條對，comment 中午就齊了。' : 'RD 要換 config C，comment 到晚上還是 TBD。',
-  ST.d.leol === 'go' ? '線尾倉少的那台，你自己跑去找到了：標籤貼錯。' : '線尾倉少的那台還在 OTA 線，F1 少領了一台。',
+  ST.d.leol === 'go' ? '線尾倉少的那台，你自己跑去找到了：標籤貼錯。' : '線尾倉少的那台還在 OTA 線，客戶少領了一台。',
   ST.d.lrd2 === 'lead' ? '四個 RD 搶一台機台，你拉了 RD 主管當場對齊。' : '四個 RD 搶一台機台，留到明天早會。'
 ];

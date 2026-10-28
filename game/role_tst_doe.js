@@ -1,15 +1,15 @@
 /* Testing EPM（Offline／DOE）的一天：08:00 看進機分配 → 21:00 追蹤表存檔。每天無限輪迴，中間隨時有人來借機。
-   ST.d.dstuck（卡六天的機台：out 先退出來／wait 等 SW）、ST.d.dreply（F1 加 10 台：split 照實回／all 先答應）、
-   ST.d.dloan（工程借機：done 測完再借／lend 先借）、ST.d.dhl（每週 F1 review：open 卡關全攤開／green 只講綠燈）、
+   ST.d.dstuck（卡六天的機台：out 先退出來／wait 等 SW）、ST.d.dreply（客戶加 10 台：split 照實回／all 先答應）、
+   ST.d.dloan（工程借機：done 測完再借／lend 先借）、ST.d.dhl（每週客戶 review：open 卡關全攤開／green 只講綠燈）、
    ST.d.durs（build 後借機：push 一個一個推／mail 寄群組信）。 */
 const labScreen = l2 => {if (W) W.screen('tst', ['OFFLINE', l2], '#ffc94a')};
 Object.assign(STORY.segs, {
   tsd_am: {name: '看進機分配', sub: 'Offline 機台昨天進了哪幾間 lab？', t: 480, mood: 'day', scene() {atDesk(); labScreen('WL 18  EE 4  CSAR 9')}},
   tsd_lab: {name: '去 Offline lab', sub: '那台待了六天的機台，到底在等什麼？', t: 560, mood: 'day', scene() {atWork(); if (W) W.put('te', 'labx')}},
-  tsd_sync: {name: 'Daily sync up', sub: 'F1 手上有新的 DOE 需求。', t: 615, mood: 'day', scene() {atMeeting()}},
+  tsd_sync: {name: 'Daily sync up', sub: '客戶手上有新的 DOE 需求。', t: 615, mood: 'day', scene() {atMeeting()}},
   tsd_hw: {name: '確認 HW／SW', sub: '加的機台，板子跟軟體到底在不在？', t: 690, mood: 'day', scene() {atWork()}},
   tsd_loan: {name: '隨時隨地', sub: '簽修、借機、轉帳、出貨，一件接一件。', t: 780, mood: 'day', scene() {atWork()}},
-  tsd_f1: {name: '每週 F1 review', sub: 'Mini build 之後每週一次，跟 F1 對進度。', t: 900, mood: 'day', scene() {atWork(); if (W) W.put('f1', 'm5')}},
+  tsd_f1: {name: '每週客戶 review', sub: 'Mini build 之後每週一次，跟客戶對進度。', t: 900, mood: 'day', scene() {atWork(); if (W) W.put('f1', 'm5')}},
   tsd_wrap: {name: 'Daily wrap up', sub: '今天的分配、明天的計畫。', t: 1020, mood: 'eve', scene() {atMeeting()}},
   tsd_wip: {name: 'WIP 收尾', sub: 'Build 快結束了，build 後的借機需求要先收齊。', t: 1110, mood: 'eve', scene() {atWork()}},
   tsd_night: {name: '無限輪迴', sub: '明天，再從第一步開始。', t: 1260, mood: 'night', scene() {atDorm()}}
@@ -42,13 +42,13 @@ STORY.beats.push(
       ['me', 'Wireless 18、EE DOE 4、CSAR 9。' + (ST.d.dstuck === 'out' ? '一台等 SW 的今天退出，天線 DOE 下午進。' : '一台在等 SW，天線 DOE 要排到明天。')],
       ['f1', '天線 DOE 我要再加 10 台，要裝新版 SW 的。今天能進嗎？'],
       ['mlb', '新版 SW 的主板，我手上只有 6 片。'],
-      ['boss', '會後確認 HW、SW 狀態，回覆 F1。']]},
+      ['boss', '會後確認 HW、SW 狀態，回覆客戶。']]},
 
   {seg: 'tsd_hw', when: isDoe, to: 'mlb', guide: '找 Ken 確認主板跟 SW 狀態',
     lines: () => [['mlb', '6 片已經燒好新版 SW。另外 4 片明天 SMA 才會打。'],
       ['me', '所以今天 6 台、明天 4 台。']],
-    mini: epmAsk('dreply', [['me', '（F1 要的是 10 台。）']], [
-      ['照實回 F1：今天 6 台、明天 4 台', 'split', {f1: 5, san: -2}],
+    mini: epmAsk('dreply', [['me', '（客戶要的是 10 台。）']], [
+      ['照實回客戶：今天 6 台、明天 4 台', 'split', {f1: 5, san: -2}],
       ['先答應 10 台，晚上再想辦法', 'all', {f1: 2, ctb: -6, san: -6}]]),
     post: () => ST.d.dreply === 'split'
       ? [['sys', '追蹤表多了兩欄：HW ready、SW ready。']]
@@ -85,7 +85,7 @@ STORY.beats.push(
 
   {seg: 'tsd_wip', when: isDoe, to: 'pc_tst', guide: '回座位，整理 build 後的借機需求',
     lines: () => [['sys', 'Build 後的借機需求：工程 12 台、RF 8 台、可靠度 6 台。還有兩個單位沒回。'],
-      ['me', '清單寄給 F1，再推各單位自己提借機單。']],
+      ['me', '清單寄給客戶，再推各單位自己提借機單。']],
     mini: epmAsk('durs', [['me', '（沒提單，build 結束那天就沒有機台可以借。）']], [
       ['一個一個打電話推', 'push', {ctb: 5, san: -7}],
       ['寄一封群組信，寫清楚截止時間', 'mail', {san: 3, ctb: -3}]]),
@@ -101,7 +101,7 @@ STORY.beats.push(
 
 TST_SUBS.doe.recap = () => [
   ST.d.dstuck === 'out' ? '卡了六天的機台退出來，天線 DOE 當天就進 lab。' : '你等了 SW，天線 DOE 排到明天。',
-  ST.d.dreply === 'split' ? '你照實回 F1：今天 6 台、明天 4 台。' : '你先答應了 10 台，晚上只進得了 6 台。',
+  ST.d.dreply === 'split' ? '你照實回客戶：今天 6 台、明天 4 台。' : '你先答應了 10 台，晚上只進得了 6 台。',
   ST.d.dloan === 'done' ? '借機等測完再放，追蹤表上沒有「待補測」。' : '三台先借出去，回來要補測。',
-  ST.d.dhl === 'open' ? '每週 review，你把卡關的都攤給 F1 看。' : '每週 review 你只講綠燈，F1 自己在系統上看到了紅的。'
+  ST.d.dhl === 'open' ? '每週 review，你把卡關的都攤給客戶看。' : '每週 review 你只講綠燈，客戶自己在系統上看到了紅的。'
 ];

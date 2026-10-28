@@ -1,4 +1,4 @@
-/* EPM24hr：共用的部分。選位子、三個數字（達成、F1 信任、體力）、開會時大家坐哪裡、結算。
+/* EPM24hr：共用的部分。選位子、三個數字（達成、客戶信任、體力）、開會時大家坐哪裡、結算。
    每個位子的一天在 role_*.js：自己的時刻（seg 名稱用位子開頭，例如 cmd_am），每件事都有 when: onRole('cmd')。
    ST.d.role 記你選的位子；ST.d.ctb、ST.d.f1、ST.d.san 是三個數字（0–100）。 */
 
@@ -28,7 +28,7 @@ const dayKey = () => ST.d.role === 'tst' ? TST_SUBS[tstSub()].day : ST.d.role;
 const myPc = () => ROLES[ST.d.role] ? ROLES[ST.d.role].pc : 'pc_cmd';
 
 /* 三個數字。eff = {ctb, f1, san}，改完跳一則通知 */
-const STAT_NAMES = {ctb: '達成', f1: 'F1 信任', san: '體力'};
+const STAT_NAMES = {ctb: '達成', f1: '客戶信任', san: '體力'};
 function epmAdd(eff) {
   if (!eff) return;
   const parts = [];
@@ -37,7 +37,7 @@ function epmAdd(eff) {
     ST.d[k] = Math.max(0, Math.min(100, (ST.d[k] == null ? 60 : ST.d[k]) + eff[k]));
     parts.push(STAT_NAMES[k] + (eff[k] > 0 ? ' +' : ' −') + Math.abs(eff[k]));
   }
-  if (parts.length) toast(parts.join('　'), '達成 ' + ST.d.ctb + '・F1 信任 ' + ST.d.f1 + '・體力 ' + ST.d.san);
+  if (parts.length) toast(parts.join('　'), '達成 ' + ST.d.ctb + '・客戶信任 ' + ST.d.f1 + '・體力 ' + ST.d.san);
 }
 /* 做選擇的小遊戲：key 存進 ST.d，opts = [[按鈕字, 值, 效果], …] */
 function epmAsk(key, lines, opts) {
@@ -90,7 +90,7 @@ STORY.beats.push(
   {seg: 'pick',
     lines: () => [['sys', '07:50。打卡機嗶了一聲，手機已經有三十幾則未讀。'],
       ['boss', '早。今天五條線都缺人手，你挑一條顧。'],
-      ['boss', '十點十五分 Daily sync up，F1 也會在。不管顧哪條，記得帶 ETA 來。']],
+      ['boss', '十點十五分 Daily sync up，客戶也會在。不管顧哪條，記得帶 ETA 來。']],
     mini(done) {
       say([['boss', '你今天顧哪一條？']], null, {choice: EPMS.map(r => [ROLES[r].name + '：' + ROLES[r].pitch, () => {
         Object.assign(ST.d, {role: r, ctb: 70, f1: 60, san: 80});
@@ -158,13 +158,13 @@ STORY.ending = () => {
   const ot = Math.max(0, ST.clock - 1050), otText = ot ? Math.floor(ot / 60) + ' 小時 ' + (ot % 60) + ' 分' : '準時';
   const sp = R.special ? R.special() : null;   /* 特殊事件（例如通宵）自己的標題 */
   const title = sp ? sp.title : ctb >= 75 && f1 >= 65 ? '今天是綠燈' : ctb >= 60 ? '今天撐過去了' : '明天再補';
-  const sub = sp ? sp.sub : san <= 30 ? '你的體力比 CTB 還紅。' : f1 >= 70 ? 'F1 今天對你點了兩次頭。' : ctb >= 75 ? '數字很好看，F1 還在觀察你。' : '有些事明天早會一定會被問。';
+  const sub = sp ? sp.sub : san <= 30 ? '你的體力比 CTB 還紅。' : f1 >= 70 ? '客戶今天對你點了兩次頭。' : ctb >= 75 ? '數字很好看，客戶還在觀察你。' : '有些事明天早會一定會被問。';
   /* 時間軸只放真的經過的時刻：seg 上可以掛 when()，沒發生的（例如沒通宵）不算 */
   const segs = Object.keys(STORY.segs).filter(k => k.indexOf(dayKey() + '_') === 0 && (!STORY.segs[k].when || STORY.segs[k].when()));
   const tl = [segs[0], segs[Math.floor(segs.length / 2)], segs[segs.length - 1]].filter(Boolean).map(k => [clockOf(STORY.segs[k].t), STORY.segs[k].name]);
   return {
     title, sub, led: roleName(), tl,
-    stats: [['位子', roleName()], ['下班', clockOf(ST.clock)], ['加班', otText], ['達成', ctb], ['F1 信任', f1], ['體力', san]],
+    stats: [['位子', roleName()], ['下班', clockOf(ST.clock)], ['加班', otText], ['達成', ctb], ['客戶信任', f1], ['體力', san]],
     lines: (R.recap ? R.recap() : []).concat(['明天早上八點，同一張桌子，同一封郵件。'])
   };
 };
