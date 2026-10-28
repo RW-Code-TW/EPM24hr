@@ -9,14 +9,14 @@ Object.assign(STORY.segs, {
   asm_fa: {name: 'Assembly FA', sub: '三點要匯報，現在兩點。', t: 840, mood: 'day', scene() {atWork()}},
   asm_wrap: {name: 'Daily wrap up', sub: 'Build status 與 line efficiency。', t: 1050, mood: 'eve', scene() {atMeeting()}},
   asm_hand: {name: '白晚班交接', sub: '晚班的線長八點到。', t: 1080, mood: 'eve', scene() {atWork()}},
-  asm_ns: {name: '晚班開線', sub: '辦公室的燈關了一半。', t: 1200, mood: 'night', scene() {atWork(); if (W) {W.show('f1', false); W.show('boss', false)}}},
-  asm_mid: {name: '半夜', sub: '手機在桌上震動。', t: 1440, mood: 'night', scene() {atWork(); if (W) {W.show('f1', false); W.show('boss', false)}}},
-  asm_dawn: {name: '晚班 build status', sub: '天快亮了。', t: 1770, mood: 'eve', scene() {atWork(); if (W) {W.show('f1', false); W.show('boss', false)}}}
+  asm_ns: {name: '晚班開線', sub: '辦公室的燈關了一半。', t: 1200, mood: 'night', scene() {atWork(); nightOff()}},
+  asm_mid: {name: '半夜', sub: '手機在桌上震動。', t: 1440, mood: 'night', scene() {atDorm()}},
+  asm_dawn: {name: '晚班 build status', sub: '天快亮了。', t: 1770, mood: 'eve', scene() {atDesk(); nightOff()}}
 });
 
 const isAsm = onRole('asm');
 STORY.beats.push(
-  {seg: 'asm_am', when: isAsm, to: 'line', guide: '去組裝線找強哥處理開線異常',
+  {seg: 'asm_am', when: isAsm, to: 'line', guide: '去組裝線找蘿拉處理開線異常',
     lines: () => [['line', '來了來了。kit to line 少一顆料，對料清單跟實物對不上，SFC 綁定也在報錯。'],
       ['line', '三個問題，你要先解哪個？我比較想先開線。']],
     mini: epmAsk('open', [['me', '（對料清單沒對完就開線，出錯就是整批重工。）']], [
@@ -24,7 +24,7 @@ STORY.beats.push(
       ['停線，把對料清單對完再開', 'stop', {ctb: -6, f1: 4}]]),
     post: () => ST.d.open === 'run'
       ? [['line', '好！開線！'], ['sys', '輸送帶動起來了。第三站空著。']]
-      : [['line', '……好啦，對就對。'], ['sys', '你跟強哥一站一站對料。九點，線才開起來。']],
+      : [['line', '……好啦，對就對。'], ['sys', '你跟蘿拉一站一站對料。九點，線才開起來。']],
     after() {if (W) {W.tower('asm', 'green'); W.screen('asm', ['FATP', ST.d.open === 'run' ? 'UPH 96 / 120' : 'UPH 60 / 120'], '#7fe3c8')}}},
   {seg: 'asm_am', when: isAsm, to: 'asmline', guide: '查 SFC 綁定異常',
     lines: () => [['sys', 'SFC 跳紅字：「序號已綁定」。'],
@@ -47,7 +47,7 @@ STORY.beats.push(
       ? [['f1', '謝謝。數據出來第一個給我。']]
       : [['f1', '下午……好吧，三點前我要看到。'], ['boss', '（看了你一眼）']]},
 
-  {seg: 'asm_noon', when: isAsm, to: 'line', guide: '跟強哥調整流線順序',
+  {seg: 'asm_noon', when: isAsm, to: 'line', guide: '跟蘿拉調整流線順序',
     lines: () => [['line', ST.d.seq === 'doe' ? '又改？DOE 的機台要換治具耶。' : '衝量我喜歡。DOE 下午再說。'],
       ['me', '辛苦了。午餐我請。'],
       ['line', '這句話你上週也講過。']]},
@@ -58,7 +58,7 @@ STORY.beats.push(
   {seg: 'asm_fa', when: isAsm, to: 'fabench', guide: '整理 Assembly FA',
     lines: () => [['sys', '三台機台外觀刮傷、一台螺絲滑牙。你把照片一張一張串進 FA 簡報。'],
       ['rep', '刮傷的位置都一樣，應該是治具。不過還在查。']]},
-  {seg: 'asm_fa', when: isAsm, t: 900, ring: ['Mandy（F1）', '來電', ANSWER],
+  {seg: 'asm_fa', when: isAsm, t: 900, ring: ['蝦倫（F1）', '來電', ANSWER],
     lines: () => [['f1', 'FA 匯報時間到了。刮傷的 root cause 是什麼？']],
     mini: epmAsk('fa', [['me', '（維修說是治具，但還沒有證據。）']], [
       ['照實講：疑似治具磨損，還在查', 'truth', {f1: 5, san: -3}],
@@ -73,10 +73,10 @@ STORY.beats.push(
       ['tst', '下線的機台我晚上就排測試。'],
       ['boss', '好。晚班的目標寫清楚，交接給晚班。']]},
 
-  {seg: 'asm_hand', when: isAsm, to: 'line', guide: '跟強哥整理白晚班交接',
+  {seg: 'asm_hand', when: isAsm, to: 'line', guide: '跟蘿拉整理白晚班交接',
     lines: () => [['line', '晚班的線長八點到。交接單我幫你印好了。'],
       ['sys', '交接單上寫著：DOE 機 40 台、第三站料已補、治具待量測、SFC 綁定已解。'],
-      ['me', '你先下班吧，強哥。'],
+      ['me', '你先下班吧，蘿拉。'],
       ['line', '你也是。……你應該不會下班對吧。']]},
 
   {seg: 'asm_ns', when: isAsm, to: 'asmline', guide: '去看晚班開線狀況',
@@ -85,20 +85,21 @@ STORY.beats.push(
       ['me', '（目前。）']]},
 
   {seg: 'asm_mid', when: isAsm, ring: ['晚班線長', '來電', ANSWER],
-    lines: () => [['sys', '00:40。'],
+    lines: () => [['sys', '00:40。宿舍。阿凱的螢幕還亮著，你的手機在桌上震動。'],
       ['sys', '（電話那頭）第五站的治具斷了一根定位銷，線停了。']],
     mini: epmAsk('night', [['me', '（備品在倉庫，鑰匙在我身上。）']], [
       ['開車回廠，親自處理', 'back', {ctb: 8, san: -20}],
       ['視訊遠端指揮換備品', 'remote', {ctb: 3, san: -8}]]),
     post: () => ST.d.night === 'back'
-      ? [['sys', '你穿著拖鞋出現在線上。一點二十分，線重新跑起來。']]
-      : [['sys', '你對著手機鏡頭比了四十分鐘。一點半，線重新跑起來。']]},
+      ? [['byron', '這麼晚還要回廠？……門我幫你開。'], ['sys', '金屬探測門、靜電服，你穿著拖鞋出現在線上。一點二十分，線重新跑起來。']]
+      : [['roomie', '你在跟誰視訊？'], ['sys', '你對著手機鏡頭比了四十分鐘。一點半，線重新跑起來。']],
+    after() {if (ST.d.night === 'back') {wearSuit(true); if (W) W.put('me', 'asmx')}}},
 
   {seg: 'asm_dawn', when: isAsm, to: 'pc_asm', guide: '更新晚班 build status，整理交接',
     lines: () => [['sys', '05:30。晚班做了 ' + (ST.d.night === 'back' ? '430' : '400') + ' 台。'],
       ['sys', '你把晚班 build status 跟交接事項寄出去，標題寫「NS update」。']]},
   {seg: 'asm_dawn', when: isAsm, end: true, t: 1800,
-    lines: () => [['sys', '06:00。天亮了。白班的強哥兩小時後到。'],
+    lines: () => [['sys', '06:00。天亮了。白班的蘿拉兩小時後到。'],
       ['sys', '你的 Daily sync up 在四小時之後。']]}
 );
 

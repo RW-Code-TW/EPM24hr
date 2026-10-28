@@ -6,7 +6,7 @@
    K 是框架借給關卡的工具（engine/world.js 的 LVK）。 */
 levelAdd('factory', function (K) {
   const {box, flat, lam, M, TX, label, screen, tower, desk, pickBox, G} = K;
-  K.bounds(-19, 19, -9, 9);
+  K.bounds(-19, 32, -9, 9);   // 右邊多出來的一塊是宿舍（跟工廠隔開，走不過去，只有換時刻才會到）
   const floor = lam(0xffffff, {map: TX.floor}), tile = lam(0xf6efd8, {map: TX.tile});
   const carpet = lam(0xd8cfbd, {map: TX.carpet}), blue = lam(0xc9d6e2, {map: TX.carpet}), wall = lam(0xf3f5f6, {map: TX.wall});
   const roomM = lam(0xe2e9ec, {map: TX.wall}), tint = lam(0xdcecf2, {map: TX.tile});
@@ -49,14 +49,19 @@ levelAdd('factory', function (K) {
   flat(10.8, 7.6, blue, -13.8, .006, -5.4, 1, G);       // 客戶辦公區
   flat(5, 8.2, blue, -16.7, .006, 4.9, 1, G);           // 會議室
   flat(5.8, 8.2, carpet, -11.3, .006, 4.9, 1, G);       // EPM 辦公室
-  pane(-19.2, -1.6, -14.6, -1.6); pane(-12.8, -1.6, -8.4, -1.6);   // 客戶辦公區前面，中間是門
-  pane(-8.4, -9.2, -8.4, -1.6);
+  pane(-19.2, -1.6, -14.6, -1.6); pane(-12.8, -1.6, -11.2, -1.6); pane(-10, -1.6, -8.4, -1.6);   // 客戶辦公區、OPM 辦公室的前面，各有一個門
+  pane(-12.2, -9.2, -12.2, -1.6);                                   // F1 和 OPM 中間隔開
   pane(-19.2, .8, -15.6, .8); pane(-14.2, .8, -12.3, .8); pane(-10.3, .8, -8.4, .8);   // 會議室、EPM 辦公室的門口
-  pane(-14.2, .8, -14.2, 9); pane(-8.4, .8, -8.4, 9);
+  pane(-14.2, .8, -14.2, 9);
+  /* 產線的牆：x -8.4 右邊整片都是產線（物料倉、RF 室、各條線、出貨倉、FA），只有主走道上一個門，門上是金屬探測門 */
+  const lineWall = lam(0xdfe5e8, {map: TX.wall});
+  [[-9.2, -1.5], [.3, 9]].forEach(([z0, z1]) => {box(.25, 2.8, z1 - z0, lineWall, -8.4, 1.4, (z0 + z1) / 2, G); stop.push([-8.53, -8.27, z0, z1])});
 
-  /* 客戶（F1）辦公區：兩排桌子，Mandy 坐中間 */
+  /* 客戶（F1）辦公區：兩排桌子，蝦倫坐中間。右邊一格隔出來是 OPM 自己的辦公室，跟主線沒什麼交集 */
   [-17, -13.8, -10.6].forEach(x => [-7, -4].forEach(z => workDesk(x, z)));
-  label('客戶辦公區 F1', -13.8, -2.6, 4, G);
+  label('客戶辦公區 F1', -15.4, -2.6, 3.6, G);
+  label('OPM', -10.3, -2.6, 1.6, G);
+  sign(['OPM', '辦公室'], -10.6, 2.0, -1.5, 1.2);
 
   /* 會議室：一張直的長桌，桌頭牆上一面螢幕 */
   box(1.6, .76, 4.2, M.desk, -16.7, .38, 5.2, G);
@@ -91,8 +96,19 @@ levelAdd('factory', function (K) {
   label('物料倉 WH', -6, -2.4, 3, G);
   glassRoom(-8.2, -4.8, 1.6, 5.6, ['RF 測試室', 'ANT / mmWave']);
   box(1.4, 1.8, 1.4, lam(0x5f7480), -6.5, .9, 3.6, G);     // 遮蔽箱
-  label('入口', -6.2, 8.4, 1.6, G);
   flat(.1, 7.4, M.tape, -3.5, .01, -5.5, 1, G);             // 物料倉與產線的分界
+
+  /* 產線的門：主走道穿過產線的牆，門框就是金屬探測門；一進門右手邊一架橘色靜電服 */
+  [-1.5, .3].forEach(z => {box(.3, 2.6, .25, M.trim, -8.4, 1.3, z, G); stop.push([-8.55, -8.25, z - .13, z + .13])});
+  box(.34, .3, 2.1, M.trim, -8.4, 2.55, -.6, G);
+  box(.26, .26, 1.6, lineWall, -8.4, 2.85, -.6, G);         // 門上方補滿到牆高
+  tower('mgate', G, -8.4, 2.7, -1.35);
+  pickBox('mgate', .8, 2.4, 1.6, -8.4, 1.2, -.6, G);
+  sign(['金屬探測門', '進產線請換靜電服'], -9.4, 2.9, -1.45, 1.4);
+  box(1.2, 1.7, .08, M.trim, -7.3, .85, -1.42, G);           // 靜電服的衣架
+  const esd = lam(0xf07a1e);
+  [-7.7, -7.3, -6.9].forEach(x => box(.34, .9, .12, esd, x, 1.1, -1.32, G));
+  stop.push([-7.9, -6.7, -1.5, -1.2]);
 
   /* ── 產線區（x -3.6 ~ 14.6）── */
   [-1.65, .45].forEach(z => flat(18.2, .1, M.tape, 5.5, .01, z, 1, G));   // 主走道的黃線
@@ -108,7 +124,8 @@ levelAdd('factory', function (K) {
   pickBox('smtline', 6, 2.4, 1.6, .4, 1.2, -8.5, G);
   label('MLB / SMA 線', .4, -7.2, 3, G);
   room(4.2, 8.6, -9.2, -7.8, 2.6, ['HSG', 'OFFLINE']);
-  room(9, 14.4, -9.2, -7.8, 2.6, ['IT / 空調', '機房']);
+  room(9, 12.2, -9.2, -7.8, 2.6, ['IT / 空調', '機房']);
+  room(12.6, 14.4, -9.2, -7.8, 2.6, ['WC', '廁所']);        // R 大守在門口
 
   /* 組裝線：SPA 站接兩條並排的 full link（CG、BP） */
   box(1.4, 1.6, 1.8, M.tool2, -1.7, .8, -5.5, G);
@@ -185,6 +202,33 @@ levelAdd('factory', function (K) {
   glassRoom(14.8, 19.2, 1.2, 6.2, ['HWTE', 'CAMERA']);
   glassRoom(14.8, 19.2, 6.6, 8.8, ['SW', 'COREOS']);
 
+  /* ── 宿舍（x 23.6 ~ 31.4）：廠區旁邊的員工宿舍，一間兩個人。下班回來，群組還在響 ── */
+  const wood = lam(0xe2c9a3, {map: TX.wood}), dormW = lam(0xf1ebe0, {map: TX.wall});
+  flat(7.8, 8.6, wood, 27.5, .006, 1.1, 1, G);
+  box(8.2, 2.8, .2, dormW, 27.5, 1.4, -3.3, G);
+  box(.2, 2.8, 8.8, dormW, 23.5, 1.4, 1.1, G);
+  box(.2, 2.8, 8.8, dormW, 31.5, 1.4, 1.1, G);
+  box(1.8, 1, .06, lam(0x1b2a44), 27.5, 1.7, -3.18, G);    // 窗戶，外面是夜
+  box(1.9, .08, .1, M.trim, 27.5, 2.22, -3.16, G); box(1.9, .08, .1, M.trim, 27.5, 1.18, -3.16, G);
+  const sheet = lam(0xdfe8f0), sheet2 = lam(0xf0d9c8);
+  [[25, sheet], [30, sheet2]].forEach(([x, s]) => {         // 兩張床，靠後牆
+    box(2.1, .4, 1.1, M.desk, x, .2, -2.5, G); box(2, .18, 1, s, x, .49, -2.5, G); box(.6, .12, .8, lam(0xffffff), x - .7, .64, -2.5, G);
+    stop.push([x - 1.05, x + 1.05, -3.2, -1.95]);
+  });
+  pickBox('bed', 2.2, 1, 1.2, 25, .5, -2.5, G);
+  desk(25.6, 2.4, 1.6, G);                                   // 你的書桌：筆電、泡麵、手機
+  box(.5, .3, .04, M.dark, 25.4, .98, 2.25, G); box(.5, .03, .35, M.trim, 25.4, .81, 2.45, G);
+  box(.18, .2, .18, lam(0xd04a2a), 26.1, .9, 2.4, G); box(.12, .02, .22, M.dark, 25.95, .81, 2.65, G);
+  stop.push([24.8, 26.4, 1.95, 2.85]);
+  pickBox('homepc', 1.8, 1.4, 1.2, 25.6, .7, 2.4, G);
+  desk(29.6, 2.4, 1.6, G);                                   // 室友的桌子：兩個螢幕
+  [29.25, 29.95].forEach(x => box(.6, .38, .04, M.dark, x, 1.0, 2.2, G));
+  stop.push([28.8, 30.4, 1.95, 2.85]);
+  box(.6, 1, .6, lam(0xe8ecee, {map: TX.panel}), 24, .5, 4.6, G);   // 小冰箱
+  stop.push([23.7, 24.3, 4.3, 4.9]);
+  label('宿舍 B 棟 3F', 27.5, 5, 3, G);
+  stop.push([19.2, 23.6, -9, 9], [23.6, 31.6, -9, -3.2], [31.4, 32, -9, 9], [23.6, 31.4, 5.6, 9]);   // 宿舍以外的地方走不過去
+
   K.block(stop);
 
   /* 人站的點 */
@@ -199,13 +243,15 @@ levelAdd('factory', function (K) {
     v1: [-3, -3.9], v2: [-3, -7.1], smt: [-1, -7.1], smtx: [2.2, -7.1],
     line: [3, -3.9], asmx: [6, -3.9],
     te: [9, -1], rep: [17, -4.55], fax: [17, -2.4],
-    wh: [10.2, 5.45], shipx: [11.4, 3.9], labx: [2.9, 4.1]
-  }, 'gate-g1 g1-a4 a1-a2 a2-a3 a3-a4 a4-a5 a5-a6 a6-a7 a7-a8 '
+    wh: [10.2, 5.45], shipx: [11.4, 3.9], labx: [2.9, 4.1], rdn: [16.2, .25],
+    f1e: [-17, -5.15], opm1: [-10.6, -5.15], opm2: [-10.6, -8.25], mgate: [-9.6, -.6], swn: [14, 3.75], rda: [13.5, -7.25], ada: [5.5, 3.75],
+    dorm: [27.5, .75], dormbed: [25, -1.25], dormpc: [25.6, 1.45], roomie: [29.6, 1.45], byron: [28, 4.25]
+  }, 'dorm-dormbed dorm-dormpc dorm-roomie dorm-byron a8-rdn f1x-f1e a7-swn smtx-rda a5-ada gate-g1 g1-a4 a1-a2 a2-a3 a3-a4 a4-a5 a5-a6 a6-a7 a7-a8 '
     + 'a2-f1x f1x-f1d a1-mtgx mtgx-m7 m7-m1 m1-m2 m2-m3 m3-m8 m7-m4 m4-m5 m5-m6 m6-m8 '
     + 'a2-epmx epmx-d_cmd epmx-d_asm epmx-oc oc-d_tst oc-d_shp oc-oc2 oc2-d_mlb oc2-d_boss '
     + 'a3-whsx whsx-iqc whsx-pdn a4-v1 v1-v2 v2-smt smt-smtx v1-line line-asmx a6-te a8-fax fax-rep a7-shipx shipx-wh g1-labx');
 
   /* 主頁背景的鏡頭 */
-  WORLD.shots = [{p: [5, 1, -4], d: 24, yaw: .3, pitch: .7}, {p: [-12, 1, 2], d: 17, yaw: -.35, pitch: .75}, {p: [14, 1, -1], d: 19, yaw: -.4, pitch: .7}];
+  WORLD.shots = [{p: [5, 1, -4], d: 24, yaw: .3, pitch: .7}, {p: [-12, 1, 2], d: 17, yaw: -.35, pitch: .75}, {p: [14, 1, -1], d: 19, yaw: -.4, pitch: .7}, {p: [27.5, 1, .5], d: 13, yaw: -.3, pitch: .7}];
 });
 WORLD.level = 'factory';

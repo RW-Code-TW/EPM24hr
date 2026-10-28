@@ -12,7 +12,7 @@ Object.assign(STORY.segs, {
   tsd_f1: {name: '每週 F1 review', sub: 'Mini build 之後每週一次，跟 F1 對進度。', t: 900, mood: 'day', scene() {atWork(); if (W) W.put('f1', 'm5')}},
   tsd_wrap: {name: 'Daily wrap up', sub: '今天的分配、明天的計畫。', t: 1020, mood: 'eve', scene() {atMeeting()}},
   tsd_wip: {name: 'WIP 收尾', sub: 'Build 快結束了，build 後的借機需求要先收齊。', t: 1110, mood: 'eve', scene() {atWork()}},
-  tsd_night: {name: '無限輪迴', sub: '明天，再從第一步開始。', t: 1260, mood: 'night', scene() {atWork(); if (W) {W.show('f1', false); W.show('boss', false)}}}
+  tsd_night: {name: '無限輪迴', sub: '明天，再從第一步開始。', t: 1260, mood: 'night', scene() {atDorm()}}
 });
 
 const isDoe = onTst('doe');
@@ -67,7 +67,7 @@ STORY.beats.push(
       ? [['rep', '好啦。CSAR 那 5 台我先轉帳。'], ['me', '（Offline 機台測完就退出，位子才轉得動。）']]
       : [['sys', '三台機台離開了 offline。追蹤表多了一行：「待補測」。']]},
 
-  {seg: 'tsd_f1', when: isDoe, to: 'f1', guide: '去會議室，跟 Mandy 開每週 review',
+  {seg: 'tsd_f1', when: isDoe, to: 'f1', guide: '去會議室，跟 蝦倫 開每週 review',
     lines: () => [['f1', '這週的 offline 進度。有什麼要 highlight 給我的？']],
     mini: epmAsk('dhl', [['me', '（追蹤表上有綠的，也有紅的。）']], [
       ['把卡關的都攤開：SW、借機、補測', 'open', {f1: 6, san: -4}],

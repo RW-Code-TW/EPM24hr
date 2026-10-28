@@ -10,7 +10,7 @@ Object.assign(STORY.segs, {
   mlb_wrap: {name: 'Wrap up meeting', sub: 'SMA input plan 與 build status。', t: 930, mood: 'day', scene() {atMeeting()}},
   mlb_adj: {name: '調整計畫', sub: '客戶的需求又變了。', t: 990, mood: 'eve', scene() {atWork()}},
   mlb_eve: {name: '晚班目標', sub: '把晚班要做的事交給內部團隊。', t: 1050, mood: 'eve', scene() {atWork()}},
-  mlb_rmt: {name: '遠端顧線', sub: '人在外面，心在 SMA。', t: 1170, mood: 'night', scene() {atWork(); if (W) {W.show('f1', false); W.show('boss', false)}}}
+  mlb_rmt: {name: '遠端顧線', sub: '人在外面，心在 SMA。', t: 1170, mood: 'night', scene() {atDorm()}}
 });
 
 const isMlb = onRole('mlb');
@@ -63,7 +63,7 @@ STORY.beats.push(
       ['asm', '我要 20 片驗治具。'],
       ['f1', '主板就那麼多，你們自己先排好。']]},
 
-  {seg: 'mlb_adj', when: isMlb, ring: ['Mandy（F1）', '來電', ANSWER],
+  {seg: 'mlb_adj', when: isMlb, ring: ['蝦倫（F1）', '來電', ANSWER],
     lines: () => [['f1', '主板分配我想改一下。FA 比較急，還是出貨比較急，你建議？']],
     mini: epmAsk('alloc', [['me', '（Testing 要 FA 的數據，Assembly 要衝出貨。）']], [
       ['主板先給 Testing 做 FA', 'tst', {f1: 4, ctb: -3}],

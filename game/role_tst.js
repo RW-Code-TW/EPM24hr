@@ -10,7 +10,7 @@ Object.assign(STORY.segs, {
   tst_fa: {name: 'FA 會議', sub: '你主持。', t: 900, mood: 'day', scene() {atWork()}},
   tst_wrap: {name: 'Daily wrap up', sub: '第三次跟催 Yield，然後開會。', t: 990, mood: 'eve', scene() {atMeeting()}},
   tst_hand: {name: '交接給維修', sub: '晚上的機台，交給阿德。', t: 1080, mood: 'eve', scene() {atWork()}},
-  tst_night: {name: '各大群組', sub: '流連於 XXT、維信、iMessage。', t: 1200, mood: 'night', scene() {atWork(); if (W) {W.show('f1', false); W.show('boss', false)}}}
+  tst_night: {name: '各大群組', sub: '流連於 XXT、維信、iMessage。', t: 1200, mood: 'night', scene() {atDorm()}}
 });
 
 const isTst = onTst('fa');

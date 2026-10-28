@@ -166,7 +166,7 @@ function initWorld(){
     const pk=box(.9,2.1,.9,M.hidden,0,1.05,0,g,false);pk.userData.pick=id;pickables.push(pk);
     scene.add(g);
     const node=o.node&&NODES[o.node]?o.node:Object.keys(NODES)[0];
-    const ch={id,g,legL,legR,armL,armR,head,path:[],node,home:node,face:o.face||0,speed:o.speed||(id==='me'?5:5.6),phase:Math.random()*6,hop:0,cb:null};
+    const ch={id,g,legL,legR,armL,armR,head,torso,path:[],node,home:node,face:o.face||0,speed:o.speed||(id==='me'?5:5.6),phase:Math.random()*6,hop:0,cb:null};
     place(ch,node);return ch}
   function place(ch,node){const n=NODES[node]||[0,0];ch.g.position.set(n[0],0,n[1]);ch.node=node;ch.path=[];ch.cb=null;ch.g.rotation.y=ch.face;ch.target=ch.face}
   const chars={},HIDDEN0=[];
@@ -352,6 +352,9 @@ function initWorld(){
     tower(id,state){setTower(id,state)},
     alarm(id){const old=alarmId;alarmId=id||null;if(old&&old!==alarmId&&towers[old])setTower(old,towers[old].state);if(alarmId)setTower(alarmId,'red')},
     show(id,on){if(chars[id])chars[id].g.visible=!!on},
+    /* 換衣服：o 是 {cloth, color}（跟 WORLD.cast 一樣的寫法），蓋過原本的；null 換回 WORLD.cast 原本的樣子 */
+    outfit(id,o){const ch=chars[id];if(!ch)return;const c=Object.assign({},WORLD.cast[id]||{},o||{}),k=String(c.cloth)+'/'+String(c.color);if(ch.fitK===k)return;ch.fitK=k;
+      ch.torso.material=torsoMats(c);const m=lam(c.cloth!=null?c.cloth:0x4a5a63);[ch.armL,ch.armR].forEach(a=>{a.children[0].material=m})},
     put(id,node){const ch=chars[id],p=NODES[node];if(!ch||!p)return;ch.path=[];ch.cb=null;ch.node=node;ch.home=node;ch.g.position.set(p[0],0,p[1])},
     screen(id,lines,color){const s=screens[id];if(!s)return;s.st.lines=lines;if(color)s.st.color=color;s.redraw()},
     focus(at,dist){focus=at?{pos:new T.Vector3(at[0],at[1],at[2]),dist:dist||11}:null},
