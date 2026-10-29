@@ -48,7 +48,7 @@ function epmAsk(key, lines, opts) {
 
 /* 場景：大家回座位／大家去會議室。你的位子上那位同事就是你，先藏起來 */
 const NPC_HOME = {cmd: 'd_cmd', asm: 'd_asm', tst: 'd_tst', shp: 'd_shp', mlb: 'd_mlb', boss: 'd_boss', f1: 'f1d', f1b: 'f1e', opm1: 'opm1', opm2: 'opm2',
-  iqc: 'iqc', pd: 'pdn', line: 'line', te: 'te', rep: 'rep', smt: 'smt', wh: 'wh', rd: 'rdn', sw: 'swn', rda: 'rda', ada: 'ada'};
+  iqc: 'iqc', pd: 'pdn', line: 'line', te: 'te', rep: 'rep', smt: 'smt', wh: 'wh', rd: 'rdn', sw: 'swn', rda: 'rda', ada: 'ada', wayne: 'wayne', zhe: 'zhe'};
 const SEATS = ['m1', 'm3', 'm4', 'm6', 'm7'];
 function hideMe() {
   if (!ST.d.role) return;
@@ -125,6 +125,8 @@ const CHAT = {
   sw: '（一邊刷機，一邊哼著周杰倫的〈明明就〉）……嗯？要刷哪一版？先講好，不要刷完再改。',
   rda: '進去之前先把手機收好。出來記得洗手。',
   ada: '想不想看紅果短劇？',
+  wayne: '客戶的靜電服在這邊，尺寸自己挑。要咖啡嗎？',
+  zhe: '會議室的水剛補好。咖啡等一下，正在煮第三壺。',
   byron: '十一點門禁喔。……好啦，我沒看到。',
   roomie: '你還在回群組喔？我明天也早班欸。'
 };

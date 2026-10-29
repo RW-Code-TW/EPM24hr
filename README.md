@@ -35,7 +35,7 @@ npm test         # 自動從頭玩到結算（電腦選第一個選項、手機�
 | 檔案 | 內容 |
 | --- | --- |
 | `game/data.js` | 主頁文字、人物、地方、名詞解釋 |
-| `game/factory.js` | 3D 工廠（照實際樓層圖簡化）：客戶辦公區、會議室、EPM 辦公室、物料倉、SMA 線、組裝線、OTA／AP 線、幾間附房、廁所、出貨倉、FA 室；右邊隔開的是宿舍 |
+| `game/factory.js` | 3D 工廠（照實際樓層圖簡化）：客戶辦公區、休息區（茶水間、健身角）、FATP／MLB 會議室、EPM 與 OPM 辦公室、前台與對外大門、物料倉、SMA 線、組裝線、OTA／AP 線、幾間附房、廁所、出貨倉、FA 室；右邊隔開的是宿舍 |
 | `game/story.js` | 選位子（Testing 再選四種之一）、三個數字（達成、客戶信任、體力）、開會座位、回宿舍（`atDorm`）、結算卡 |
 | `game/role_cmd.js` … `role_mlb.js` | 五個位子各自的一天（`role_tst.js` 是 Testing 的 FA DRI；`role_shp.js` 裡有「通宵」特殊事件） |
 | `game/role_tst_rule.js`、`role_tst_doe.js`、`role_tst_rel.js` | Testing 的 Test rule、Offline／DOE、Rel tracker 各自的一天 |
